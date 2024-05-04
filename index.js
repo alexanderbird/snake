@@ -123,16 +123,24 @@ class GameState {
   handleKey(key) {
     switch (key) {
       case 'ArrowDown':
-        this.direction = Direction.DOWN;
+        if (this.direction !== Direction.UP) {
+          this.direction = Direction.DOWN;
+        }
         break;
       case 'ArrowRight':
-        this.direction = Direction.RIGHT;
+        if (this.direction !== Direction.LEFT) {
+          this.direction = Direction.RIGHT;
+        }
         break;
       case 'ArrowLeft':
-        this.direction = Direction.LEFT;
+        if (this.direction !== Direction.RIGHT) {
+          this.direction = Direction.LEFT;
+        }
         break;
       case 'ArrowUp':
-        this.direction = Direction.UP;
+        if (this.direction !== Direction.DOWN) {
+          this.direction = Direction.UP;
+        }
         break;
     }
   }
