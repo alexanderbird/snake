@@ -58,8 +58,32 @@ class Cell {
     });
   }
 
+  move(direction) {
+    switch (direction) {
+      case Direction.UP: return this.up();
+      case Direction.DOWN: return this.down();
+      case Direction.RIGHT: return this.right();
+      case Direction.LEFT: return this.left();
+    }
+  }
+
+  down() {
+    const newRow = (this.row + 1) % configuration.rows;
+    return new Cell({ row: newRow, column: this.column });
+  }
+
+  up() {
+    const newRow = (configuration.rows + this.row - 1) % configuration.rows;
+    return new Cell({ row: newRow, column: this.column });
+  }
+
   right() {
     const newColumn = (this.column + 1) % configuration.columns;
+    return new Cell({ row: this.row, column: newColumn });
+  }
+
+  left() {
+    const newColumn = (configuration.columns + this.column - 1) % configuration.columns;
     return new Cell({ row: this.row, column: newColumn });
   }
 }
@@ -68,20 +92,28 @@ const Thing = {
   SNAKE_HEAD: {
     name: 'SNAKE_HEAD',
     cssClass: 'thing--snake-head',
-    nextPosition: cell => cell.right()
+    nextPosition: (cell, direction) => cell.move(direction)
   },
 }
 
+const Direction = {
+  UP: 'UP',
+  RIGHT: 'RIGHT',
+  DOWN: 'DOWN',
+  LEFT: 'LEFT'
+}
+
 class GameState {
-  constructor(boardThings) {
+  constructor(boardThings, direction) {
     this.boardThings = boardThings;
+    this.direction = direction;
   }
 
   static initialState() {
     const initialState = {
       [new Cell({ row: 5, column: 5 })]: Thing.SNAKE_HEAD
     }
-    return new GameState(initialState);
+    return new GameState(initialState, Direction.RIGHT);
   }
     
   getCell(cell) {
@@ -91,25 +123,25 @@ class GameState {
   handleKey(key) {
     switch (key) {
       case 'ArrowDown':
-        console.log('downnnn');
+        this.direction = Direction.DOWN;
         break;
       case 'ArrowRight':
-        console.log('righttttt');
+        this.direction = Direction.RIGHT;
         break;
       case 'ArrowLeft':
-        console.log('leftttttt');
+        this.direction = Direction.LEFT;
         break;
       case 'ArrowUp':
-        console.log('uppppp');
+        this.direction = Direction.UP;
         break;
     }
   }
 
   next() {
     const nextBoardThings = Object.fromEntries(Object.entries(this.boardThings).map(([key, value]) => {
-      const newKey = value.nextPosition(Cell.parse(key));
+      const newKey = value.nextPosition(Cell.parse(key), this.direction);
       return [newKey, value];
     }));
-    return new GameState(nextBoardThings);
+    return new GameState(nextBoardThings, this.direction);
   }
 }
