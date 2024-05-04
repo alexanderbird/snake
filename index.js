@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
   const gameElement = document.querySelector('#game');
-  initializeGame(gameElement);
+  const { onKeyDown } = initializeGame(gameElement);
+  document.addEventListener('keydown', onKeyDown);
 });
 
 const configuration = {
@@ -18,6 +19,11 @@ function initializeGame(element) {
     state = nextState;
     element.innerHTML = html
   }, configuration.clockSpeed);
+  return {
+    onKeyDown: ({ key }) => {
+      state.handleKey(key);
+    }
+  }
 }
 
 function renderGame(board, state) {
@@ -80,6 +86,23 @@ class GameState {
     
   getCell(cell) {
     return this.boardThings[cell]?.cssClass || '';
+  }
+
+  handleKey(key) {
+    switch (key) {
+      case 'ArrowDown':
+        console.log('downnnn');
+        break;
+      case 'ArrowRight':
+        console.log('righttttt');
+        break;
+      case 'ArrowLeft':
+        console.log('leftttttt');
+        break;
+      case 'ArrowUp':
+        console.log('uppppp');
+        break;
+    }
   }
 
   next() {
