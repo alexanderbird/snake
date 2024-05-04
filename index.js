@@ -9,7 +9,7 @@ const dimensions = {
 
 function renderGame() {
   const board = Array.from({ length: dimensions.columns }).map((_, column) =>
-    Array.from({ length: dimensions.rows }).map((_, row) => ({ row, column })));
+    Array.from({ length: dimensions.rows }).map((_, row) => new Cell({ row, column })));
   const state = new GameState();
   return `
     <table>
@@ -22,13 +22,29 @@ function renderGame() {
   `;
 }
 
+class Cell {
+  constructor({ row, column }) {
+    this.row = row;
+    this.column = column;
+  }
+
+  toString() {
+    return `CELL-${this.column}-${this.row}`;
+  }
+}
+
+const Thing = {
+  SNAKE_HEAD: { name: 'SNAKE_HEAD', cssClass: 'thing--snake-head' },
+}
+
 class GameState {
   constructor() {
     this.boardThings = {
+      [new Cell({ row: 5, column: 5 })]: Thing.SNAKE_HEAD
     }
   }
     
-  getCell({ row, column }) {
-    return '';
+  getCell(cell) {
+    return this.boardThings[cell]?.cssClass || '';
   }
 }

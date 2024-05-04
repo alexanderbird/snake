@@ -8,3 +8,7 @@ table tr td .cell {
   width: 8px;
   height: 8px;
 }
+
+.thing--snake-head {
+  background-color: blue;
+}
