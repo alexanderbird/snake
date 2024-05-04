@@ -6,17 +6,22 @@ document.addEventListener('DOMContentLoaded', () => {
 const dimensions = {
   columns: 64,
   rows: 64,
+  clockSpeed: 100,
 }
 
 function initializeGame(element) {
   const board = Array.from({ length: dimensions.columns }).map((_, column) =>
     Array.from({ length: dimensions.rows }).map((_, row) => new Cell({ row, column })));
-  const state = new GameState();
-  element.innerHTML = renderGame(board, state);
+  let state = new GameState();
+  setInterval(() => {
+    const { state: newState, html } = renderGame(board, state);
+    state = newState;
+    element.innerHTML = html
+  }, dimensions.clockSpeed);
 }
 
 function renderGame(board, state) {
-  return `
+  const html = `
     <table>
       ${board.map(row => `
         <tr>
@@ -25,6 +30,7 @@ function renderGame(board, state) {
       `).join('')}
     </table>
   `;
+  return { html, state };
 }
 
 class Cell {
