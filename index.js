@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
-  document.querySelector('#game').innerHTML = renderGame();
+  const gameElement = document.querySelector('#game');
+  initializeGame(gameElement);
 });
 
 const dimensions = {
@@ -7,10 +8,14 @@ const dimensions = {
   rows: 64,
 }
 
-function renderGame() {
+function initializeGame(element) {
   const board = Array.from({ length: dimensions.columns }).map((_, column) =>
     Array.from({ length: dimensions.rows }).map((_, row) => new Cell({ row, column })));
   const state = new GameState();
+  element.innerHTML = renderGame(board, state);
+}
+
+function renderGame(board, state) {
   return `
     <table>
       ${board.map(row => `
