@@ -3,21 +3,21 @@ document.addEventListener('DOMContentLoaded', () => {
   initializeGame(gameElement);
 });
 
-const dimensions = {
+const configuration = {
   columns: 64,
   rows: 64,
   clockSpeed: 100,
 }
 
 function initializeGame(element) {
-  const board = Array.from({ length: dimensions.columns }).map((_, row) =>
-    Array.from({ length: dimensions.rows }).map((_, column) => new Cell({ row, column })));
+  const board = Array.from({ length: configuration.columns }).map((_, row) =>
+    Array.from({ length: configuration.rows }).map((_, column) => new Cell({ row, column })));
   let state = GameState.initialState();
   setInterval(() => {
     const { nextState, html } = renderGame(board, state);
     state = nextState;
     element.innerHTML = html
-  }, dimensions.clockSpeed);
+  }, configuration.clockSpeed);
 }
 
 function renderGame(board, state) {
