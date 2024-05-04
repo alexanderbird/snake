@@ -10,17 +10,18 @@ const dimensions = {
 }
 
 function initializeGame(element) {
-  const board = Array.from({ length: dimensions.columns }).map((_, column) =>
-    Array.from({ length: dimensions.rows }).map((_, row) => new Cell({ row, column })));
-  let state = new GameState();
+  const board = Array.from({ length: dimensions.columns }).map((_, row) =>
+    Array.from({ length: dimensions.rows }).map((_, column) => new Cell({ row, column })));
+  let state = GameState.initialState();
   setInterval(() => {
-    const { state: newState, html } = renderGame(board, state);
-    state = newState;
+    const { nextState, html } = renderGame(board, state);
+    state = nextState;
     element.innerHTML = html
   }, dimensions.clockSpeed);
 }
 
 function renderGame(board, state) {
+  const nextState = state.next();
   const html = `
     <table>
       ${board.map(row => `
@@ -30,7 +31,7 @@ function renderGame(board, state) {
       `).join('')}
     </table>
   `;
-  return { html, state };
+  return { html, nextState };
 }
 
 class Cell {
@@ -42,20 +43,49 @@ class Cell {
   toString() {
     return `CELL-${this.column}-${this.row}`;
   }
+
+  static parse(text) {
+    const [prefix, column, row] = text.split('-');
+    return new Cell({
+      row: Number(row),
+      column: Number(column),
+    });
+  }
+
+  right() {
+    return new Cell({ row: this.row, column: this.column + 1 });
+  }
 }
 
 const Thing = {
-  SNAKE_HEAD: { name: 'SNAKE_HEAD', cssClass: 'thing--snake-head' },
+  SNAKE_HEAD: {
+    name: 'SNAKE_HEAD',
+    cssClass: 'thing--snake-head',
+    nextPosition: cell => cell.right()
+  },
 }
 
 class GameState {
-  constructor() {
-    this.boardThings = {
+  constructor(boardThings) {
+    this.boardThings = boardThings;
+  }
+
+  static initialState() {
+    const initialState = {
       [new Cell({ row: 5, column: 5 })]: Thing.SNAKE_HEAD
     }
+    return new GameState(initialState);
   }
     
   getCell(cell) {
     return this.boardThings[cell]?.cssClass || '';
+  }
+
+  next() {
+    const nextBoardThings = Object.fromEntries(Object.entries(this.boardThings).map(([key, value]) => {
+      const newKey = value.nextPosition(Cell.parse(key));
+      return [newKey, value];
+    }));
+    return new GameState(nextBoardThings);
   }
 }
