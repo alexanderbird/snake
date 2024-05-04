@@ -53,7 +53,8 @@ class Cell {
   }
 
   right() {
-    return new Cell({ row: this.row, column: this.column + 1 });
+    const newColumn = (this.column + 1) % configuration.columns;
+    return new Cell({ row: this.row, column: newColumn });
   }
 }
 
