@@ -92,12 +92,14 @@ const Thing = {
   SNAKE_HEAD: {
     name: 'SNAKE_HEAD',
     cssClass: 'thing--snake-head',
-    nextPosition: (cell, direction) => cell.move(direction)
+    nextPosition: (cell, direction) => cell.move(direction),
+    onCollisionFrom: (otherThing, state) => alert('nope'),
   },
   WALL: {
     name: 'WALL',
     cssClass: 'thing--wall',
-    nextPosition: (cell, direction) => cell
+    nextPosition: (cell, direction) => cell,
+    onCollisionFrom: (otherThing, state) => alert('that is a wall!'),
   }
 }
 
@@ -156,8 +158,12 @@ class GameState {
   }
 
   next() {
+    const occupiedSpaces = new Set(Object.keys(this.boardThings));
     const nextBoardThings = Object.fromEntries(Object.entries(this.boardThings).map(([key, value]) => {
       const newKey = value.nextPosition(Cell.parse(key), this.direction);
+      if (value === Thing.SNAKE_HEAD && occupiedSpaces.has(newKey.toString())) {
+        setTimeout(() => this.boardThings[newKey].onCollisionFrom(value));
+      }
       return [newKey, value];
     }));
     return new GameState(nextBoardThings, this.direction);
