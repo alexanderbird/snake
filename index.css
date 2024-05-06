@@ -9,6 +9,14 @@ table tr td .cell {
   height: 8px;
 }
 
+.cell {
+  transition: background-color 2s;
+}
+
 .thing--snake-head {
   background-color: blue;
+}
+
+.thing--wall {
+  background-color: gray;
 }

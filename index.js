@@ -94,6 +94,11 @@ const Thing = {
     cssClass: 'thing--snake-head',
     nextPosition: (cell, direction) => cell.move(direction)
   },
+  WALL: {
+    name: 'WALL',
+    cssClass: 'thing--wall',
+    nextPosition: (cell, direction) => cell
+  }
 }
 
 const Direction = {
@@ -112,6 +117,9 @@ class GameState {
   static initialState() {
     const initialState = {
       [new Cell({ row: 5, column: 5 })]: Thing.SNAKE_HEAD
+    }
+    for (let row = 0; row < configuration.rows / 2; row++) {
+      initialState[new Cell({ row, column: 30 })] = Thing.WALL;
     }
     return new GameState(initialState, Direction.RIGHT);
   }
