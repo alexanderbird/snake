@@ -1,5 +1,7 @@
 # Snake
 
+[snake.alexanderbird.software](http://snake.alexanderbird.software/)
+
 A vanilla JavaScript snake game.
 
 I started this on an airplane without internet, and I challenged myself to build
