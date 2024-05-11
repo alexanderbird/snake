@@ -13,19 +13,22 @@ const configuration = {
 function initializeGame(element) {
   const board = Array.from({ length: configuration.columns }).map((_, row) =>
     Array.from({ length: configuration.rows }).map((_, column) => new Cell({ row, column })));
-  let state = GameState.initialState();
+  let gameLoopInterval;
+  const updateCell = (cell, thing, gameOver) => {
+    const cellElement = element.querySelector('.' + cell.toString());
+    if (cellElement) {
+      cellElement.className = ['cell', cell.toString(), thing].join(' ');
+    } else {
+      console.log('Attempted to update out of bounds cell: ' + cell.toString());
+    }
+    if (gameOver) {
+      clearInterval(gameLoopInterval);
+    }
+  };
+  let state = GameState.initialState(updateCell);
   element.innerHTML = renderGame(board, state);
-  setInterval(() => {
-    const nextState = state.next({
-      updateCell: (cell, thing) => {
-        const cellElement = element.querySelector('.' + cell.toString());
-        if (cellElement) {
-          cellElement.className = ['cell', cell.toString(), thing].join(' ');
-        } else {
-          console.log('Attempted to update out of bounds cell: ' + cell.toString());
-        }
-      },
-    });
+  gameLoopInterval = setInterval(() => {
+    const nextState = state.next();
     state = nextState;
   }, configuration.clockSpeed);
   return {
@@ -100,13 +103,15 @@ const Thing = {
     name: 'SNAKE_HEAD',
     cssClass: 'thing--snake-head',
     nextPosition: (cell, direction) => cell.move(direction),
-    onCollisionFrom: (otherThing, state) => alert('nope'),
+    onCollisionFrom: (otherThing, state) => {
+      console.error('Somehow, something collided with the snake head');
+    },
   },
   WALL: {
     name: 'WALL',
     cssClass: 'thing--wall',
     nextPosition: (cell, direction) => cell,
-    onCollisionFrom: (otherThing, state) => alert('that is a wall!'),
+    onCollisionFrom: (otherThing, state) => state.clearAll(),
   }
 }
 
@@ -118,12 +123,13 @@ const Direction = {
 }
 
 class GameState {
-  constructor(boardThings, direction) {
+  constructor(boardThings, direction, updateCell) {
     this.boardThings = boardThings;
     this.direction = direction;
+    this.updateCell = updateCell;
   }
 
-  static initialState() {
+  static initialState(updateCell) {
     const initialState = {
       [new Cell({ row: 5, column: 5 })]: Thing.SNAKE_HEAD
     }
@@ -132,7 +138,13 @@ class GameState {
       initialState[new Cell({ row, column: 40 })] = Thing.WALL;
       initialState[new Cell({ row: configuration.rows - row - 1, column: 30 })] = Thing.WALL;
     }
-    return new GameState(initialState, Direction.RIGHT);
+    return new GameState(initialState, Direction.RIGHT, updateCell);
+  }
+
+  clearAll() {
+    this.mapBoardThings(({ cell, thing }) => {
+      this.updateCell(cell, '', true);
+    });
   }
 
   handleKey(key) {
@@ -160,18 +172,24 @@ class GameState {
     }
   }
 
-  next({ updateCell }) {
+  mapBoardThings(callback) {
+    return Object.entries(this.boardThings).map(([keyString, value]) => {
+      const key = Cell.parse(keyString);
+      return callback({ cell: key, thing: value });
+    });
+  }
+
+  next() {
     const occupiedSpaces = new Set(Object.keys(this.boardThings));
-    const nextBoardThings = Object.fromEntries(Object.entries(this.boardThings).map(([key, value]) => {
-      const oldKey = Cell.parse(key);
-      const newKey = value.nextPosition(oldKey, this.direction);
-      if (value === Thing.SNAKE_HEAD && occupiedSpaces.has(newKey.toString())) {
-        setTimeout(() => this.boardThings[newKey].onCollisionFrom(value));
+    const nextBoardThings = Object.fromEntries(this.mapBoardThings(({ cell: oldKey, thing }) => {
+      const newKey = thing.nextPosition(oldKey, this.direction);
+      if (thing === Thing.SNAKE_HEAD && occupiedSpaces.has(newKey.toString())) {
+        setTimeout(() => this.boardThings[newKey].onCollisionFrom(thing, this));
       }
-      updateCell(oldKey, '');
-      updateCell(newKey, value.cssClass || '');
-      return [newKey, value];
+      this.updateCell(oldKey, '');
+      this.updateCell(newKey, thing.cssClass || '');
+      return [newKey, thing];
     }));
-    return new GameState(nextBoardThings, this.direction);
+    return new GameState(nextBoardThings, this.direction, this.updateCell);
   }
 }
