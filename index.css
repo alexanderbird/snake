@@ -11,6 +11,9 @@ table tr td .cell {
 }
 
 .cell {
+}
+
+.cell:not(.thing--snake-head) {
   transition: background-color 2s;
 }
 
