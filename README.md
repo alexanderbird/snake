@@ -17,15 +17,15 @@ It's been an interesting exercise to figure out what I miss most about modern
 tooling. Here are the things I miss most:
 
 1. Splitting my code into separate files
-  - it's much easier to navigate between files than to scroll up and down in a
+   - it's much easier to navigate between files than to scroll up and down in a
     file.
 2. Unit tests
-  - when I restructure the code, I feel worried that something is broken. I
+   - when I restructure the code, I feel worried that something is broken. I
     don't have this stress when I'm TDDing my code.
 3. Types
-  - A type-checking build step gives me more confidence that everything is wired
+   - A type-checking build step gives me more confidence that everything is wired
     up correctly.
 4. Abstracting away the rendering process
-  - it's not too bad to set and update HTML directly, but it does make me
+   - it's not too bad to set and update HTML directly, but it does make me
     appreciate how I don't have to think about that low level detail when I'm
     using a UI framework.
