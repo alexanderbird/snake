@@ -24,3 +24,19 @@ table tr td .cell {
 .thing--wall {
   background-color: gray;
 }
+
+.thing--fruit {
+  font-size: 8px;
+}
+
+.thing--fruit-apple:before {
+  content: '🍎';
+}
+
+.thing--fruit-blueberry:before {
+  content: '🫐';
+}
+
+.thing--fruit-lemon:before {
+  content: '🍋';
+}

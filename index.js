@@ -98,6 +98,19 @@ class Cell {
   }
 }
 
+function fruit(name) {
+  return {
+    name: `FRUIT_${name.toUpperCase()}`,
+    cssClass: `thing--fruit thing--fruit-${name}`,
+    nextPosition: (cell, direction) => cell,
+    onCollisionFrom: (otherThing, state) => {
+      if (otherThing === Thing.SNAKE_HEAD) {
+        state.onFruitEaten(name);
+      }
+    }
+  }
+}
+
 const Thing = {
   SNAKE_HEAD: {
     name: 'SNAKE_HEAD',
@@ -112,7 +125,10 @@ const Thing = {
     cssClass: 'thing--wall',
     nextPosition: (cell, direction) => cell,
     onCollisionFrom: (otherThing, state) => state.clearAll(),
-  }
+  },
+  FRUIT_APPLE: fruit('apple'),
+  FRUIT_LEMON: fruit('lemon'),
+  FRUIT_BLUEBERRY: fruit('blueberry'),
 }
 
 const Direction = {
@@ -131,7 +147,10 @@ class GameState {
 
   static initialState(updateCell) {
     const initialState = {
-      [new Cell({ row: 5, column: 5 })]: Thing.SNAKE_HEAD
+      [new Cell({ row: 5, column: 5 })]: Thing.SNAKE_HEAD,
+      [new Cell({ row: 22, column: 22 })]: Thing.FRUIT_APPLE,
+      [new Cell({ row: 44, column: 44 })]: Thing.FRUIT_LEMON,
+      [new Cell({ row: 20, column: 31 })]: Thing.FRUIT_BLUEBERRY,
     }
     for (let row = 0; row < configuration.rows / 2; row++) {
       initialState[new Cell({ row, column: 20 })] = Thing.WALL;
@@ -145,6 +164,10 @@ class GameState {
     this.mapBoardThings(({ cell, thing }) => {
       this.updateCell(cell, '', true);
     });
+  }
+
+  onFruitEaten(fruit) {
+    console.log(`Ate a ${fruit}`);
   }
 
   handleKey(key) {
