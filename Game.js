@@ -1,6 +1,12 @@
 module.Game = (async function main() {
+  
+  const { GameBoard } = await dependsOn('GameBoard');
+  const { HtmlGameBoardRenderer } = await dependsOn('HtmlGameBoardRenderer');
+  
   function initializeGame({ element }) {
-    element.innerHTML = 'Hey, Snake';
+    const board = new GameBoard();
+    const renderer = new HtmlGameBoardRenderer();
+    element.innerHTML = renderer.render(board);
   }
 
   return {
