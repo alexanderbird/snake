@@ -7,6 +7,10 @@ module.CellReference = (async function main() {
       this.#row = row;
       this.#column = column;
     }
+
+    toString() {
+      return this.#column;
+    }
   }
 
   return {
