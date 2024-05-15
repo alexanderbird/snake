@@ -1,13 +1,13 @@
 <table>
   <tr>
-    <td><div class='cell'></div></td>
-    <td><div class='cell'></div></td>
-    <td><div class='cell'></div></td>
+    <td><div class='cell cell-c0-r0'></div></td>
+    <td><div class='cell cell-c1-r0'></div></td>
+    <td><div class='cell cell-c2-r0'></div></td>
   </tr>
   <tr>
-    <td><div class='cell'></div></td>
-    <td><div class='cell'></div></td>
-    <td><div class='cell'></div></td>
+    <td><div class='cell cell-c0-r1'></div></td>
+    <td><div class='cell cell-c1-r1'></div></td>
+    <td><div class='cell cell-c2-r1'></div></td>
   </tr>
 </table>
       
