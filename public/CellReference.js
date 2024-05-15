@@ -8,6 +8,17 @@ module.CellReference = (async function main() {
       this.#column = column;
     }
 
+    static parse(string) {
+    }
+
+    getRow() {
+      return this.#row;
+    }
+
+    getColumn() {
+      return this.#column;
+    }
+
     toString() {
       return this.#column + '|' + this.#row;
     }

@@ -29,8 +29,13 @@ module.exports = (async function main() {
       expect(one.toString()).toNotEqual(two.toString());
     });
 
-    it('can be serialized and deserialized', ({ skip }) => {
-      skip();
+    it('can be serialized and deserialized', ({ expect }) => {
+      const row = Math.round(Math.random() * 1000);
+      const column = Math.round(Math.random() * 1000);
+      const cell = new CellReference({ row, column });
+      const deserialized = CellReference.parse(cell.toString());
+      expect(cell.getRow()).toEqual(row);
+      expect(cell.getColumn()).toEqual(column);
     });
   });
 })();
