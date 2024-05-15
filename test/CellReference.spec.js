@@ -23,6 +23,12 @@ module.exports = (async function main() {
       expect(one.toString()).toNotEqual(two.toString());
     });
 
+    it('does not consider 11,1 to be equal to 1,11', ({ expect }) => {
+      const one = new CellReference({ row: 11, column: 1 });
+      const two = new CellReference({ row: 1, column: 11 });
+      expect(one.toString()).toNotEqual(two.toString());
+    });
+
     it('can be serialized and deserialized', ({ skip }) => {
       skip();
     });
