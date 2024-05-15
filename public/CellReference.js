@@ -9,6 +9,8 @@ module.CellReference = (async function main() {
     }
 
     static parse(string) {
+      const [column, row] = string.split('|');
+      return new CellReference({ column: Number(column), row: Number(row) });
     }
 
     getRow() {

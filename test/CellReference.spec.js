@@ -34,8 +34,12 @@ module.exports = (async function main() {
       const column = Math.round(Math.random() * 1000);
       const cell = new CellReference({ row, column });
       const deserialized = CellReference.parse(cell.toString());
-      expect(cell.getRow()).toEqual(row);
-      expect(cell.getColumn()).toEqual(column);
+      expect(deserialized.getRow()).toEqual(row);
+      expect(deserialized.getColumn()).toEqual(column);
+    });
+
+    it('serializes as a human-readable slug', ({ skip }) => {
+      skip();
     });
   });
 })();
