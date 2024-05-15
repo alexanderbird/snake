@@ -34,6 +34,13 @@ function describe(scope, describeBody) {
             pass();
           }
         },
+        toNotEqual: expected => {
+          if (actual === expected) {
+            fail(`expected ${JSON.stringify(actual)} not to equal ${JSON.stringify(expected)}.`);
+          } else {
+            pass();
+          }
+        },
         toMatchSnapshot: () => {
           const snapshotPath = path.join(__dirname, 'snapshots', fullName.replace(/[^a-zA-Z0-9]+/g, '-'));
           const approvedPath = snapshotPath + '.approved.txt';
