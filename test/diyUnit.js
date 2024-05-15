@@ -50,13 +50,14 @@ function describe(scope, describeBody) {
           try { fs.writeFileSync(approvedPath, '', { flag: 'wx' }); } catch(ignored) {}
           const approvedString = fs.readFileSync(approvedPath, 'utf-8');
           if (actualString !== approvedString) {
-            fail('expected to match snapshot');
+            fail(`expected to match snapshot\nApproved: ${approvedPath}\nReceived: ${receivedPath}\n`);
             try {
               child_process.execSync(
                 `diff -y ${approvedPath} ${receivedPath}`,
                 {stdio: 'inherit'}
               );
             } catch(ignored) {}
+            console.log(`\nTo approve:\n  cp ${snapshotPath}.{received,approved}.txt`);
           } else {
             pass();
           }

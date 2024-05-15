@@ -1,12 +1,11 @@
 module.HtmlGameBoardRenderer = (async function main() {
   class HtmlGameBoardRenderer {
     render(gameBoard) {
-      return `
-        <table>
-          ${gameBoard.getCells().map(row =>
-            `<tr>${row.map(cell => `<td><div class='cell'></div></td>`).join('')}</tr>`  
-          ).join('')}
-      </table>
+      return `<table>${gameBoard.getCells().map(row =>
+            `\n  <tr>\n${row.map(cell =>
+            `    <td><div class='cell'></div></td>`).join('\n')
+            }\n  </tr>`  
+          ).join('')}\n</table>
       `;
     }
   }

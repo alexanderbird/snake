@@ -1,0 +1,13 @@
+<table>
+  <tr>
+    <td><div class='cell'></div></td>
+    <td><div class='cell'></div></td>
+    <td><div class='cell'></div></td>
+  </tr>
+  <tr>
+    <td><div class='cell'></div></td>
+    <td><div class='cell'></div></td>
+    <td><div class='cell'></div></td>
+  </tr>
+</table>
+      
