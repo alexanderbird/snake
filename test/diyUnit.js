@@ -2,17 +2,12 @@ const fs = require('fs');
 const path = require('path');
 const child_process = require('child_process');
 
-function describe(scope, tests) {
-  console.log(`
-
-  🔨 DIY Unit 🔨
-  ~ the "good enough" testing stuff ~
-
-  `)
-  const statistics = {
-    total: 0,
-    failed: 0,
-  }
+const statistics = {
+  total: 0,
+  failed: 0,
+}
+const tests = [];
+function describe(scope, describeBody) {
   function it(test, body) {
     const fullName = `${scope} ${test}`;
     statistics.total += 1;
@@ -61,9 +56,19 @@ function describe(scope, tests) {
     body({ expect, fail, pass });
   }
 
-  tests({ it });
+  tests.push(() => describeBody({ it }));
+}
+
+async function runAll() {
+  console.log(`
+
+  🔨 DIY Unit 🔨
+  ~ the "good enough" testing stuff ~
+
+  `)
+  tests.forEach(test => test());
   console.log('\n------------------------------------------------');
   console.log(`${statistics.total} tests run, ${statistics.failed} failed`);
 }
 
-module.exports = { describe };
+module.exports = { describe, runAll };

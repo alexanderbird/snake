@@ -1,7 +1,7 @@
 const { diyRequire } = require('./diyRequire');
 const { describe } = require('./diyUnit');
 
-(async function main() {
+module.exports = (async function main() {
   const { GameBoard } = await diyRequire('GameBoard');
   const { AsciiGameBoardRenderer } = await diyRequire('AsciiGameBoardRenderer');
 
