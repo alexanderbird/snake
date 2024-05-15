@@ -9,7 +9,7 @@ module.CellReference = (async function main() {
     }
 
     toString() {
-      return this.#column;
+      return this.#column + this.#row;
     }
   }
 

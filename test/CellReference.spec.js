@@ -17,8 +17,10 @@ module.exports = (async function main() {
       expect(one.toString()).toNotEqual(two.toString());
     });
 
-    it('considers different row and identical column as inequal', ({ skip }) => {
-      skip();
+    it('considers different row and identical column as inequal', ({ expect }) => {
+      const one = new CellReference({ row: 42, column: 99 });
+      const two = new CellReference({ row: 0, column: 99 });
+      expect(one.toString()).toNotEqual(two.toString());
     });
 
     it('can be serialized and deserialized', ({ skip }) => {
