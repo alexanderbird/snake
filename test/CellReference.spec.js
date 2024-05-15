@@ -38,8 +38,9 @@ module.exports = (async function main() {
       expect(deserialized.getColumn()).toEqual(column);
     });
 
-    it('serializes as a human-readable slug', ({ skip }) => {
-      skip();
+    it('serializes as a human-readable slug', ({ expect }) => {
+      const cell = new CellReference({ row: 23, column: 56 });
+      expect(cell.toString()).toEqual('cell-c56-r23');
     });
   });
 })();

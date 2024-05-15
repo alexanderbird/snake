@@ -9,7 +9,7 @@ module.CellReference = (async function main() {
     }
 
     static parse(string) {
-      const [column, row] = string.split('|');
+      const [_, column, row] = string.split(/-[cr]/);
       return new CellReference({ column: Number(column), row: Number(row) });
     }
 
@@ -22,7 +22,7 @@ module.CellReference = (async function main() {
     }
 
     toString() {
-      return this.#column + '|' + this.#row;
+      return `cell-c${this.#column}-r${this.#row}`;
     }
   }
 
