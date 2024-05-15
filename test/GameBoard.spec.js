@@ -9,8 +9,7 @@ const { describe } = require('./diyUnit');
     it('starts with some walls and stuff', ({ expect }) => {
       const board = new GameBoard();
       const renderer = new AsciiGameBoardRenderer();
-      //console.log(renderer.render(board));
-      expect(1).toEqual(1);
+      expect(renderer.render(board)).toMatchSnapshot();
     });
   });
 })();
