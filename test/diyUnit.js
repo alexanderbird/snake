@@ -22,7 +22,7 @@ function describe(scope, describeBody) {
     }
 
     function skip() {
-      console.error(`⭕️ ${fullName} [skipped]`);
+      console.error(`🟡 ${fullName} [skipped]`);
     }
 
     function expect(actual) {
