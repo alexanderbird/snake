@@ -21,6 +21,10 @@ function describe(scope, describeBody) {
       console.error(`✅ ${fullName}`);
     }
 
+    function skip() {
+      console.error(`⭕️ ${fullName} [skipped]`);
+    }
+
     function expect(actual) {
       return {
         toEqual: expected => {
@@ -53,7 +57,7 @@ function describe(scope, describeBody) {
       }
     }
 
-    body({ expect, fail, pass });
+    body({ expect, fail, pass, skip });
   }
 
   tests.push(() => describeBody({ it }));
@@ -63,7 +67,7 @@ async function runAll() {
   console.log(`
 
   🔨 DIY Unit 🔨
-  ~ the "good enough" testing stuff ~
+  ~ a brutalist unit test framework ~
 
   `)
   tests.forEach(test => test());
