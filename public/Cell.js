@@ -17,7 +17,10 @@ module.Cell = (async function main() {
     }
 
     cssClass() {
-      return this.#location.cssClass()
+      return [this.#location, this.#sprite]
+        .filter(x => !!x)
+        .map(x => x.cssClass())
+        .join(' ');
     }
   }
 

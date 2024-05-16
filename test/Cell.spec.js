@@ -37,7 +37,19 @@ module.exports = (async function main() {
     });
 
     it('has a CSS class with the location and the sprite', ({ expect, skip }) => {
-      skip()
+      const cellReference = new CellReference({
+        row: Math.round(Math.random() * 1000),
+        column: Math.round(Math.random() * 1000),
+      });
+      const cell = new Cell({
+        location: cellReference,
+        sprite: Sprite.WALL,
+      });
+      expect(cell.cssClass()).toEqual(
+        cellReference.cssClass()
+        + ' '
+        + Sprite.WALL.cssClass()
+      );
     });
   });
 })();
