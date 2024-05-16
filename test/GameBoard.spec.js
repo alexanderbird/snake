@@ -6,11 +6,10 @@ module.exports = (async function main() {
   const { AsciiGameBoardRenderer } = await diyRequire('AsciiGameBoardRenderer');
 
   describe('GameBoard', ({ it }) => {
-    it('starts with some walls and stuff', ({ expect, skip }) => {
+    it('starts with some walls and stuff', ({ expect }) => {
       const board = new GameBoard();
       const renderer = new AsciiGameBoardRenderer();
-      skip();
-      //expect(renderer.render(board)).toMatchSnapshot();
+      expect(renderer.render(board)).toMatchSnapshot();
     });
   });
 })();
