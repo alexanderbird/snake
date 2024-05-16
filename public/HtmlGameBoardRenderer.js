@@ -3,7 +3,7 @@ module.HtmlGameBoardRenderer = (async function main() {
     render(gameBoard) {
       return `<table>${gameBoard.getCells().map(row =>
             `\n  <tr>\n${row.map(cell =>
-            `    <td><div class='cell ${cell.getLocation()}'></div></td>`).join('\n')
+            `    <td><div class='cell ${cell.cssClass()}'></div></td>`).join('\n')
             }\n  </tr>`  
           ).join('')}\n</table>
       `;
