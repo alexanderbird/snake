@@ -25,8 +25,15 @@ module.exports = (async function main() {
       expect(cell.getSprite()).toEqual(Sprite.SNAKE_HEAD);
     });
 
-    it('has a CSS class with only the location CSS class when there is no sprite', ({ expect, skip }) => {
-      skip()
+    it('has a CSS class with only the location CSS class when there is no sprite', ({ expect }) => {
+      const cellReference = new CellReference({
+        row: Math.round(Math.random() * 1000),
+        column: Math.round(Math.random() * 1000),
+      });
+      const cell = new Cell({
+        location: cellReference,
+      });
+      expect(cell.cssClass()).toEqual(cellReference.cssClass());
     });
 
     it('has a CSS class with the location and the sprite', ({ expect, skip }) => {

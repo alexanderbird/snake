@@ -15,6 +15,10 @@ module.Cell = (async function main() {
     getSprite() {
       return this.#sprite;
     }
+
+    cssClass() {
+      return this.#location.cssClass()
+    }
   }
 
   return {
