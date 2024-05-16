@@ -6,12 +6,18 @@ module.exports = (async function main() {
 
   describe('Sprite', ({ it }) => {
     [
-      { expectedName: 'SNAKE_HEAD', sprite: Sprite.SNAKE_HEAD },
-      { expectedName: 'WALL', sprite: Sprite.WALL },
-    ].forEach(({ expectedName, sprite }) => {
+      { expectedName: 'SNAKE_HEAD', cssClass: 'sprite__snake-head', sprite: Sprite.SNAKE_HEAD },
+      { expectedName: 'WALL', cssClass: 'sprite__wall', sprite: Sprite.WALL },
+    ].forEach(({ expectedName, cssClass, sprite }) => {
+
       it(`serializes ${expectedName} correctly`, ({ expect }) => {
         expect(sprite.toString()).toEqual(expectedName);
       });
+      
+      it(`has a reasonable CSS class for ${expectedName}`, ({ expect }) => {
+        expect(sprite.cssClass()).toEqual(cssClass);
+      });
+
     });
   });
 })();

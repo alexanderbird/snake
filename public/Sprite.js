@@ -9,6 +9,10 @@ module.Sprite = (async function main() {
       this.#name = name;
     }
 
+    cssClass() {
+      return `sprite__${this.#name.toLowerCase().replace(/_/g, '-')}`;
+    }
+
     toString() {
       return this.#name;
     }
