@@ -4,6 +4,7 @@ const { describe } = require('./diyUnit');
 module.exports = (async function main() {
   const { CellReference } = await diyRequire('CellReference');
   const { Cell } = await diyRequire('Cell');
+  const { Sprite } = await diyRequire('Sprite');
 
   describe('Cell', ({ it }) => {
     it('has a cell reference', ({ expect }) => {
@@ -15,6 +16,13 @@ module.exports = (async function main() {
         location: cellReference,
       });
       expect(cell.getLocation()).toEqual(cellReference);
+    });
+
+    it('has a sprite', ({ expect }) => {
+      const cell = new Cell({
+        sprite: Sprite.SNAKE_HEAD,
+      });
+      expect(cell.getSprite()).toEqual(Sprite.SNAKE_HEAD);
     });
   });
 })();
