@@ -24,6 +24,10 @@ module.CellReference = (async function main() {
     toString() {
       return `cell-c${this.#column}-r${this.#row}`;
     }
+
+    cssClass() {
+      return this.toString();
+    }
   }
 
   return {

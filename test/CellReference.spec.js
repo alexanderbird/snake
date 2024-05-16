@@ -42,5 +42,10 @@ module.exports = (async function main() {
       const cell = new CellReference({ row: 23, column: 56 });
       expect(cell.toString()).toEqual('cell-c56-r23');
     });
+
+    it('has a CSS class equal to the toString output', ({ expect }) => {
+      const cell = new CellReference({ row: 23, column: 56 });
+      expect(cell.cssClass()).toEqual(cell.toString());
+    });
   });
 })();
