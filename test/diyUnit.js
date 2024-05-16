@@ -25,18 +25,26 @@ function describe(scope, describeBody) {
       console.error(`🟡 ${fullName} [skipped]`);
     }
 
+    function toString(something) {
+      const json = JSON.stringify(something);
+      if (json === "{}") {
+        return something.toString();
+      }
+      return json;
+    }
+
     function expect(actual) {
       return {
         toEqual: expected => {
           if (actual !== expected) {
-            fail(`expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}.`);
+            fail(`expected ${toString(expected)}, got ${toString(actual)}.`);
           } else {
             pass();
           }
         },
         toNotEqual: expected => {
           if (actual === expected) {
-            fail(`expected ${JSON.stringify(actual)} not to equal ${JSON.stringify(expected)}.`);
+            fail(`expected ${toString(actual)} not to equal ${toString(expected)}.`);
           } else {
             pass();
           }
