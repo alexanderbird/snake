@@ -14,7 +14,7 @@ td {
   border: 1px solid black;
   min-width: var(--cell-size);
   max-width: var(--cell-size);
-  height: var(--cell-size);
+  height: calc(var(--cell-size) + 1px);
   line-height: var(--cell-size);
   font-size: calc(var(--cell-size) + 4px);
   margin: -2px;
