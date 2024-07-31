@@ -3,10 +3,10 @@ const DIMENSIONS = {
   width: 50,
   height: 50,
 }
-const SPRITE = {
+const SPRITE = Object.freeze({
   head: '⬤',
   body: '●',
-  fruit: {
+  fruit: Object.freeze({
     lemon: '🍋',
     grapes: '🍇',
     strawberry: '🍓',
@@ -18,8 +18,8 @@ const SPRITE = {
       const index = Math.floor(Math.random() * SPRITE.fruit.all.length);
       return SPRITE.fruit.all[index]
     }
-  }
-}
+  })
+})
 const cannedBoards = Array.from({ length: DIMENSIONS.width }).map((_, i) => generateBoard(i));
 
 let nthTick = 0;
