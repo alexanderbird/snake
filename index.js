@@ -29,10 +29,15 @@ function gameLoop() {
 
 
 function gameLoopTick() {
-  const board = cannedBoards[nthTick];
-  nthTick = (nthTick + 1) % cannedBoards.length;
-  updateBoard(board);
+  updateBoard(getNextBoard());
 }
+
+function getNextBoard() {
+  nthTick = (nthTick + 1) % cannedBoards.length;
+  return cannedBoards[nthTick];
+}
+
+
 
 function updateBoard(board) {
   board.forEach((columns, row) => {
