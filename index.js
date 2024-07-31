@@ -6,8 +6,8 @@ const DIMENSIONS = {
 
 class Sprite {
   static EMPTY = new Sprite('empty', '');
-  static HEAD = new Sprite('snake', '⬤');
-  static BODY = new Sprite('snake', '●');
+  static HEAD = new Sprite('snake-head', '◕');
+  static BODY = new Sprite('snake-body', '●');
   static WALL = new Sprite('obstacle', '▩');
   static LEMON = new Sprite('edible', '🍋');
   static GRAPES = new Sprite('edible', '🍇');
@@ -209,7 +209,7 @@ function updateBoard(board) {
         throw new Error(`Cannot find cell row=${row} column=${column}`);
       }
       cell.textContent = value || Sprite.EMPTY;
-      cell.style.setProperty('--sprite-type', value.type);
+      cell.dataset['spriteType'] = value.type;
     });
   });
 }
