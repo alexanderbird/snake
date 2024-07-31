@@ -6,7 +6,7 @@ const DIMENSIONS = {
 
 class Sprite {
   static EMPTY = new Sprite('empty', '');
-  static HEAD = new Sprite('snake-head', '◕');
+  static HEAD = new Sprite('snake-head', '⫙');
   static BODY = new Sprite('snake-body', '●');
   static WALL = new Sprite('obstacle', '▩');
   static LEMON = new Sprite('edible', '🍋');
