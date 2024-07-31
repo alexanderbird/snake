@@ -71,15 +71,21 @@ class Position {
 }
 
 class Direction {
-  static RIGHT = new Direction(({ row, column }) => ({ row, column: column + 1 }));
-  static LEFT = new Direction(({ row, column }) => ({ row, column: column - 1 }));
-  static DOWN = new Direction(({ row, column }) => ({ row: row + 1, column }));
-  static UP = new Direction(({ row, column }) => ({ row: row - 1, column }));
+  static RIGHT = new Direction(({ row, column }) => ({ row, column: column + 1 }), () => Direction.LEFT);
+  static LEFT = new Direction(({ row, column }) => ({ row, column: column - 1 }), () => Direction.RIGHT);
+  static DOWN = new Direction(({ row, column }) => ({ row: row + 1, column }), () => Direction.UP);
+  static UP = new Direction(({ row, column }) => ({ row: row - 1, column }), () => Direction.DOWN);
 
   #transform;
+  #opposite
 
-  constructor(transform) {
+  constructor(transform, opposite) {
     this.#transform = transform;
+    this.#opposite = opposite;
+  }
+
+  get opposite() {
+    return this.#opposite();
   }
 
   move(position) {
@@ -120,11 +126,13 @@ class IndexedItems {
 class Snake {
   #position
   #length
+  #tail
   #direction
-  constructor({ length, position, direction }) {
+  constructor({ length, position, direction, tail }) {
     this.#position = position;
     this.#length = length;
     this.#direction = direction;
+    this.#tail = tail || Snake.generateTail({ head: position, length, direction: direction.opposite });
   }
 
   move() {
@@ -132,6 +140,7 @@ class Snake {
       position: this.#direction.move(this.#position),
       direction: this.#direction,
       length: this.#length,
+      tail: [...this.#tail.slice(1), this.#position],
     });
   }
 
@@ -148,16 +157,23 @@ class Snake {
       position: this.#position,
       direction: direction,
       length: this.#length,
+      tail: this.#tail,
     });
   }
 
   forEach(visitor) {
     visitor(this.#position, Sprite.HEAD);
-    for (let i = 1; i < this.#length; i++) {
-      const row = this.#position.row;
-      const column = (this.#position.column - i) % DIMENSIONS.width;
-      visitor(new Position({ row, column }), Sprite.BODY);
+    this.#tail.forEach(x => visitor(x, Sprite.BODY));
+  }
+
+  static generateTail({ head, length, direction }) {
+    const tail = [];
+    let pointer = head;
+    for (let i = 1; i < length; i++) {
+      pointer = direction.move(pointer);
+      tail.unshift(pointer);
     }
+    return tail;
   }
 }
 
