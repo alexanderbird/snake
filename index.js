@@ -30,24 +30,19 @@ class Sprite {
   }
 }
 
-const SPRITE = Object.freeze({
-  head: Sprite.HEAD,
-  body: Sprite.BODY,
-  wall: Sprite.WALL,
-  fruit: Object.freeze({
-    lemon: Sprite.LEMON,
-    grapes: Sprite.GRAPES,
-    strawberry: Sprite.STRAWBERRY,
-    cherries: Sprite.CHERRIES,
-    get all() {
-      return Object.keys(SPRITE.fruit).filter(x => x !== 'all' && x !== 'random').map(key => SPRITE.fruit[key])
-    },
-    get random() {
-      const index = Math.floor(Math.random() * SPRITE.fruit.all.length);
-      return SPRITE.fruit.all[index]
-    }
-  })
-})
+const Fruit = Object.freeze({
+  lemon: Sprite.LEMON,
+  grapes: Sprite.GRAPES,
+  strawberry: Sprite.STRAWBERRY,
+  cherries: Sprite.CHERRIES,
+  get all() {
+    return Object.keys(Fruit).filter(x => x !== 'all' && x !== 'random').map(key => Fruit[key])
+  },
+  get random() {
+    const index = Math.floor(Math.random() * Fruit.all.length);
+    return Fruit.all[index]
+  }
+});
 
 class Position {
   #row;
@@ -124,11 +119,11 @@ class Snake {
   }
 
   forEach(visitor) {
-    visitor(this.#position, SPRITE.head);
+    visitor(this.#position, Sprite.HEAD);
     for (let i = 1; i < this.#length; i++) {
       const row = this.#position.row;
       const column = (this.#position.column - i) % DIMENSIONS.width;
-      visitor(new Position({ row, column }), SPRITE.body);
+      visitor(new Position({ row, column }), Sprite.BODY);
     }
   }
 }
@@ -160,10 +155,10 @@ class BoardState {
 
   static initial() {
     const fruit = new IndexedItems([
-      { position: new Position({ row: Math.floor(Math.random() * DIMENSIONS.height), column: Math.floor(Math.random() * DIMENSIONS.width) }), item: SPRITE.fruit.random },
-      { position: new Position({ row: Math.floor(Math.random() * DIMENSIONS.height), column: Math.floor(Math.random() * DIMENSIONS.width) }), item: SPRITE.fruit.random },
-      { position: new Position({ row: Math.floor(Math.random() * DIMENSIONS.height), column: Math.floor(Math.random() * DIMENSIONS.width) }), item: SPRITE.fruit.random },
-      { position: new Position({ row: Math.floor(Math.random() * DIMENSIONS.height), column: Math.floor(Math.random() * DIMENSIONS.width) }), item: SPRITE.fruit.random },
+      { position: new Position({ row: Math.floor(Math.random() * DIMENSIONS.height), column: Math.floor(Math.random() * DIMENSIONS.width) }), item: Fruit.random },
+      { position: new Position({ row: Math.floor(Math.random() * DIMENSIONS.height), column: Math.floor(Math.random() * DIMENSIONS.width) }), item: Fruit.random },
+      { position: new Position({ row: Math.floor(Math.random() * DIMENSIONS.height), column: Math.floor(Math.random() * DIMENSIONS.width) }), item: Fruit.random },
+      { position: new Position({ row: Math.floor(Math.random() * DIMENSIONS.height), column: Math.floor(Math.random() * DIMENSIONS.width) }), item: Fruit.random },
     ]);
     const snake = new Snake({ length: 4, position: new Position({ row: 3, column: 10 }) });
     const walls = Array.from({ length: DIMENSIONS.width })
