@@ -75,14 +75,9 @@ class BoardState {
   constructor({ fruit, snake }) {
     this.#fruit = fruit;
     this.#snake = snake;
-    this.#walls = [
-      new Position({ row: 5, column: 5 }),
-      new Position({ row: 5, column: 6 }),
-      new Position({ row: 5, column: 7 }),
-      new Position({ row: 5, column: 8 }),
-      new Position({ row: 5, column: 9 }),
-      new Position({ row: 5, column: 10 }),
-    ]
+    this.#walls = Array.from({ length: DIMENSIONS.width })
+      .map((_, i) => new Position({ row: 5, column: i }))
+      .filter(x => x.column > 4 && x.column < DIMENSIONS.width - 4);
   }
 
   forEach(visitor) {
