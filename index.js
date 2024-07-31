@@ -3,15 +3,42 @@ const DIMENSIONS = {
   width: 50,
   height: 40,
 }
+
+class Sprite {
+  static EMPTY = new Sprite('empty', '');
+  static HEAD = new Sprite('snake', '⬤');
+  static BODY = new Sprite('snake', '●');
+  static WALL = new Sprite('obstacle', '▩');
+  static LEMON = new Sprite('edible', '🍋');
+  static GRAPES = new Sprite('edible', '🍇');
+  static STRAWBERRY = new Sprite('edible', '🍓');
+  static CHERRIES = new Sprite('edible', '🍒');
+
+  #type;
+  #character;
+  constructor(type, character) {
+    this.#type = type;
+    this.#character = character;
+  }
+
+  get type() {
+    return this.#type;
+  }
+
+  toString() {
+    return this.#character;
+  }
+}
+
 const SPRITE = Object.freeze({
-  head: '⬤',
-  body: '●',
-  wall: '▩',
+  head: Sprite.HEAD,
+  body: Sprite.BODY,
+  wall: Sprite.WALL,
   fruit: Object.freeze({
-    lemon: '🍋',
-    grapes: '🍇',
-    strawberry: '🍓',
-    cherries: '🍒',
+    lemon: Sprite.LEMON,
+    grapes: Sprite.GRAPES,
+    strawberry: Sprite.STRAWBERRY,
+    cherries: Sprite.CHERRIES,
     get all() {
       return Object.keys(SPRITE.fruit).filter(x => x !== 'all' && x !== 'random').map(key => SPRITE.fruit[key])
     },
@@ -100,7 +127,7 @@ class BoardState {
   forEach(visitor) {
     this.#fruit.forEach(visitor);
     this.#snake.forEach(visitor);
-    this.#walls.forEach(position => visitor(position, SPRITE.wall));
+    this.#walls.forEach(position => visitor(position, Sprite.WALL));
   }
 
   static initial() {
@@ -159,11 +186,11 @@ function getNextBoard(state) {
     if (!item) {
       console.error('missing item', position, item)
     }
-    if(board[position.row] === undefined) {
+    if(!board[position.row]) {
       console.error(`Row ${position.row} is not on the board (item ${item})`, position);
     }
-    if(board[position.row][position.column] === undefined) {
-      console.error(`Column ${position.column} is not on the board (item ${item})`, position);
+    if(!board[position.row][position.column]) {
+      console.error(`Column ${position.column} is not on the board (item ${item})`, position, board[position.row][position.column]);
     }
     board[position.row][position.column] = item;
   });
@@ -175,16 +202,20 @@ function updateBoard(board) {
     columns.forEach((value, column) => {
       const selector = `[data-row="${row}"][data-column="${column}"]`;
       const cell = document.querySelector(selector);
+      if (!value) {
+        throw new Error(`We're missing a value for ${JSON.stringify({row, column})}`)
+      }
       if (!cell) {
         throw new Error(`Cannot find cell row=${row} column=${column}`);
       }
-      cell.textContent = value || '';
+      cell.textContent = value || Sprite.EMPTY;
+      cell.style.setProperty('--sprite-type', value.type);
     });
   });
 }
 
 function generateEmptyBoard() {
-  return Array.from({ length: DIMENSIONS.height }).map(() => Array.from({ length: DIMENSIONS.width }).map(() => null));
+  return Array.from({ length: DIMENSIONS.height }).map(() => Array.from({ length: DIMENSIONS.width }).map(() => Sprite.EMPTY));
 }
 
 function withinBoardWidth(x) {
