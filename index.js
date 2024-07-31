@@ -136,6 +136,14 @@ class Snake {
   }
 
   turn(direction) {
+    if (
+      direction === Direction.RIGHT && this.#direction === Direction.LEFT
+      || direction === Direction.LEFT && this.#direction === Direction.RIGHT
+      || direction === Direction.DOWN && this.#direction === Direction.UP
+      || direction === Direction.UP && this.#direction === Direction.DOWN
+    ) {
+      return this;
+    }
     return new Snake({
       position: this.#position,
       direction: direction,
