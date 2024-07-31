@@ -1,4 +1,4 @@
-const GAME_SPEED = 500;
+const GAME_SPEED = 100;
 const DIMENSIONS = {
   width: 50,
   height: 40,
@@ -53,8 +53,8 @@ class Position {
   #row;
   #column;
   constructor({ row, column }) {
-    this.#row = row;
-    this.#column = column;
+    this.#row = (row + DIMENSIONS.height) % DIMENSIONS.height;
+    this.#column = (column + DIMENSIONS.width) % DIMENSIONS.width;
   }
 
   get row() {
@@ -72,6 +72,20 @@ class Position {
 
   toString() {
     return JSON.stringify({ row: this.row, column: this.column });
+  }
+}
+
+class Direction {
+  static RIGHT = new Direction(({ row, column }) => ({ row, column: column + 1 }));
+
+  #transform;
+
+  constructor(transform) {
+    this.#transform = transform;
+  }
+
+  move(position) {
+    return new Position(this.#transform(position));
   }
 }
 
@@ -102,6 +116,13 @@ class Snake {
     this.#length = length;
   }
 
+  move() {
+    return new Snake({
+      position: Direction.RIGHT.move(this.#position),
+      length: this.#length,
+    });
+  }
+
   forEach(visitor) {
     visitor(this.#position, SPRITE.head);
     for (let i = 1; i < this.#length; i++) {
@@ -116,18 +137,25 @@ class BoardState {
   #fruit;
   #snake;
   #walls;
-  constructor({ fruit, snake }) {
+  constructor({ fruit, snake, walls }) {
     this.#fruit = fruit;
     this.#snake = snake;
-    this.#walls = Array.from({ length: DIMENSIONS.width })
-      .map((_, i) => new Position({ row: 5, column: i }))
-      .filter(x => x.column > 4 && x.column < DIMENSIONS.width - 4);
+    this.#walls = walls;
   }
 
   forEach(visitor) {
     this.#fruit.forEach(visitor);
     this.#snake.forEach(visitor);
     this.#walls.forEach(position => visitor(position, Sprite.WALL));
+  }
+
+  mutate(modifier) {
+    const updates = modifier({
+      fruit: this.#fruit,
+      snake: this.#snake,
+      walls: this.#walls,
+    });
+    return new BoardState({ fruit: this.#fruit, snake: this.#snake, walls: this.#walls, ...updates });
   }
 
   static initial() {
@@ -138,9 +166,13 @@ class BoardState {
       { position: new Position({ row: Math.floor(Math.random() * DIMENSIONS.height), column: Math.floor(Math.random() * DIMENSIONS.width) }), item: SPRITE.fruit.random },
     ]);
     const snake = new Snake({ length: 4, position: new Position({ row: 3, column: 10 }) });
+    const walls = Array.from({ length: DIMENSIONS.width })
+      .map((_, i) => new Position({ row: 5, column: i }))
+      .filter(x => x.column > 4 && x.column < DIMENSIONS.width - 4);
     return new BoardState({
       fruit,
-      snake
+      snake,
+      walls
     })
   }
 }
@@ -177,7 +209,11 @@ function gameLoopTick(state) {
 }
 
 function nextBoardState(previousState) {
-  return previousState;
+  return previousState.mutate(({ snake }) => {
+    return {
+      snake: snake.move()
+    }
+  });
 }
 
 function getNextBoard(state) {
