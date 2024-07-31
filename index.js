@@ -1,7 +1,7 @@
 const GAME_SPEED = 500;
 const DIMENSIONS = {
   width: 50,
-  height: 50,
+  height: 40,
 }
 const SPRITE = Object.freeze({
   head: '⬤',
