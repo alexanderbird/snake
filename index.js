@@ -1,4 +1,4 @@
-const GAME_SPEED = 3000;
+const GAME_SPEED = 500;
 const DIMENSIONS = {
   width: 50,
   height: 50,
@@ -93,10 +93,10 @@ class BoardState {
 
   static initial() {
     const fruit = new IndexedItems([
-      { position: new Position({ row: Math.round(Math.random() * DIMENSIONS.height - 1), column: Math.round(Math.random() * DIMENSIONS.width - 1) }), item: SPRITE.fruit.random },
-      { position: new Position({ row: Math.round(Math.random() * DIMENSIONS.height - 1), column: Math.round(Math.random() * DIMENSIONS.width - 1) }), item: SPRITE.fruit.random },
-      { position: new Position({ row: Math.round(Math.random() * DIMENSIONS.height - 1), column: Math.round(Math.random() * DIMENSIONS.width - 1) }), item: SPRITE.fruit.random },
-      { position: new Position({ row: Math.round(Math.random() * DIMENSIONS.height - 1), column: Math.round(Math.random() * DIMENSIONS.width - 1) }), item: SPRITE.fruit.random },
+      { position: new Position({ row: Math.floor(Math.random() * DIMENSIONS.height), column: Math.floor(Math.random() * DIMENSIONS.width) }), item: SPRITE.fruit.random },
+      { position: new Position({ row: Math.floor(Math.random() * DIMENSIONS.height), column: Math.floor(Math.random() * DIMENSIONS.width) }), item: SPRITE.fruit.random },
+      { position: new Position({ row: Math.floor(Math.random() * DIMENSIONS.height), column: Math.floor(Math.random() * DIMENSIONS.width) }), item: SPRITE.fruit.random },
+      { position: new Position({ row: Math.floor(Math.random() * DIMENSIONS.height), column: Math.floor(Math.random() * DIMENSIONS.width) }), item: SPRITE.fruit.random },
     ]);
     const snake = new IndexedItems([
       { position: new Position({ row: 3, column: 10 }), item: SPRITE.head },
@@ -130,24 +130,37 @@ function main() {
 }
 
 function gameLoop() {
-  setInterval(gameLoopTick, GAME_SPEED);
+  let state = BoardState.initial();
+  const eachTick = () => {
+    state = gameLoopTick(state)
+  };
+  setInterval(eachTick, GAME_SPEED);
+  eachTick();
 }
 
 
-function gameLoopTick() {
-  updateBoard(getNextBoard());
+function gameLoopTick(state) {
+  updateBoard(getNextBoard(state));
+  return nextBoardState(state);
 }
 
-function getNextBoard() {
-  const state = BoardState.initial();
+function nextBoardState(previousState) {
+  return previousState;
+}
+
+function getNextBoard(state) {
   const board = generateEmptyBoard()
   state.forEach((position, item) => {
-    console.log({ row: position.row, column: position.column, item });
     if (!item) {
       console.error('missing item', position, item)
-    } else {
-      board[position.row][position.column] = item;
     }
+    if(board[position.row] === undefined) {
+      console.error(`Row ${position.row} is not on the board (item ${item})`, position);
+    }
+    if(board[position.row][position.column] === undefined) {
+      console.error(`Column ${position.column} is not on the board (item ${item})`, position);
+    }
+    board[position.row][position.column] = item;
   });
   return board;
 }
