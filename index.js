@@ -65,7 +65,24 @@ class IndexedItems {
   forEach(visitor) {
     Object.entries(this.#items).map(([key, value]) => visitor(Position.parse(key), value));
   }
+}
 
+class Snake {
+  #position
+  #length
+  constructor({ length, position }) {
+    this.#position = position;
+    this.#length = length;
+  }
+
+  forEach(visitor) {
+    visitor(this.#position, SPRITE.head);
+    for (let i = 1; i < this.#length; i++) {
+      const row = this.#position.row;
+      const column = (this.#position.column - i) % DIMENSIONS.width;
+      visitor(new Position({ row, column }), SPRITE.body);
+    }
+  }
 }
 
 class BoardState {
@@ -93,14 +110,7 @@ class BoardState {
       { position: new Position({ row: Math.floor(Math.random() * DIMENSIONS.height), column: Math.floor(Math.random() * DIMENSIONS.width) }), item: SPRITE.fruit.random },
       { position: new Position({ row: Math.floor(Math.random() * DIMENSIONS.height), column: Math.floor(Math.random() * DIMENSIONS.width) }), item: SPRITE.fruit.random },
     ]);
-    const snake = new IndexedItems([
-      { position: new Position({ row: 3, column: 10 }), item: SPRITE.head },
-      { position: new Position({ row: 3, column: 9 }), item: SPRITE.body },
-      { position: new Position({ row: 3, column: 8 }), item: SPRITE.body },
-      { position: new Position({ row: 3, column: 7 }), item: SPRITE.body },
-      { position: new Position({ row: 3, column: 6 }), item: SPRITE.body },
-      { position: new Position({ row: 3, column: 5 }), item: SPRITE.body },
-    ]);
+    const snake = new Snake({ length: 4, position: new Position({ row: 3, column: 10 }) });
     return new BoardState({
       fruit,
       snake
