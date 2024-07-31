@@ -85,6 +85,17 @@ class Direction {
   move(position) {
     return new Position(this.#transform(position));
   }
+
+  static fromKeyboard(key) {
+    switch(key) {
+      case 'ArrowUp': return Direction.UP;
+      case 'ArrowRight': return Direction.RIGHT;
+      case 'ArrowDown': return Direction.DOWN;
+      case 'ArrowLeft': return Direction.LEFT;
+      default:
+        throw new Error(`Unknown arrow key '${key}'`);
+    }
+  }
 }
 
 class IndexedItems {
@@ -120,6 +131,14 @@ class Snake {
     return new Snake({
       position: this.#direction.move(this.#position),
       direction: this.#direction,
+      length: this.#length,
+    });
+  }
+
+  turn(direction) {
+    return new Snake({
+      position: this.#position,
+      direction: direction,
       length: this.#length,
     });
   }
@@ -266,9 +285,10 @@ function handleKeyPress(event, state) {
   if (!event.key.startsWith("Arrow")) {
     return state;
   }
-  console.log(event);
   return state.mutate(({ snake }) => {
-    return {};
+    return {
+      snake: snake.turn(Direction.fromKeyboard(event.key))
+    };
   });
 }
 
