@@ -72,6 +72,9 @@ class Position {
 
 class Direction {
   static RIGHT = new Direction(({ row, column }) => ({ row, column: column + 1 }));
+  static LEFT = new Direction(({ row, column }) => ({ row, column: column - 1 }));
+  static DOWN = new Direction(({ row, column }) => ({ row: row + 1, column }));
+  static UP = new Direction(({ row, column }) => ({ row: row - 1, column }));
 
   #transform;
 
@@ -106,14 +109,17 @@ class IndexedItems {
 class Snake {
   #position
   #length
-  constructor({ length, position }) {
+  #direction
+  constructor({ length, position, direction }) {
     this.#position = position;
     this.#length = length;
+    this.#direction = direction;
   }
 
   move() {
     return new Snake({
-      position: Direction.RIGHT.move(this.#position),
+      position: this.#direction.move(this.#position),
+      direction: this.#direction,
       length: this.#length,
     });
   }
@@ -160,7 +166,7 @@ class BoardState {
       { position: new Position({ row: Math.floor(Math.random() * DIMENSIONS.height), column: Math.floor(Math.random() * DIMENSIONS.width) }), item: Fruit.random },
       { position: new Position({ row: Math.floor(Math.random() * DIMENSIONS.height), column: Math.floor(Math.random() * DIMENSIONS.width) }), item: Fruit.random },
     ]);
-    const snake = new Snake({ length: 4, position: new Position({ row: 3, column: 10 }) });
+    const snake = new Snake({ direction: Direction.RIGHT, length: 4, position: new Position({ row: 3, column: 10 }) });
     const walls = Array.from({ length: DIMENSIONS.width })
       .map((_, i) => new Position({ row: 5, column: i }))
       .filter(x => x.column > 4 && x.column < DIMENSIONS.width - 4);
@@ -190,8 +196,11 @@ function main() {
 
 function gameLoop() {
   let state = BoardState.initial();
+  document.body.addEventListener('keydown', event => {
+    state = handleKeyPress(event, state);
+  });
   const eachTick = () => {
-    state = gameLoopTick(state)
+    state = gameLoopTick(state);
   };
   setInterval(eachTick, GAME_SPEED);
   eachTick();
@@ -252,4 +261,15 @@ function generateEmptyBoard() {
 function withinBoardWidth(x) {
   return (x % DIMENSIONS.width)
 }
+
+function handleKeyPress(event, state) {
+  if (!event.key.startsWith("Arrow")) {
+    return state;
+  }
+  console.log(event);
+  return state.mutate(({ snake }) => {
+    return {};
+  });
+}
+
 document.addEventListener('DOMContentLoaded', main);
