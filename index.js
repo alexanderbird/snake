@@ -1,4 +1,4 @@
-const GAME_SPEED = 100;
+const GAME_SPEED = 3000;
 const DIMENSIONS = {
   width: 50,
   height: 50,
@@ -6,6 +6,7 @@ const DIMENSIONS = {
 const SPRITE = Object.freeze({
   head: '⬤',
   body: '●',
+  wall: '▩',
   fruit: Object.freeze({
     lemon: '🍋',
     grapes: '🍇',
@@ -20,9 +21,97 @@ const SPRITE = Object.freeze({
     }
   })
 })
-const cannedBoards = Array.from({ length: DIMENSIONS.width }).map((_, i) => generateBoard(i));
 
-let nthTick = 0;
+class Position {
+  #row;
+  #column;
+  constructor({ row, column }) {
+    this.#row = row;
+    this.#column = column;
+  }
+
+  get row() {
+    return this.#row;
+  }
+
+  get column() {
+    return this.#column;
+  }
+
+  static parse(string) {
+    const { row, column } = JSON.parse(string);
+    return new Position({ row, column });
+  }
+
+  toString() {
+    return JSON.stringify({ row: this.row, column: this.column });
+  }
+}
+
+class IndexedItems {
+  #items;
+  constructor(items = []) {
+    this.#items = Object.fromEntries(items.map(({ position, item }) => [position, item]));
+  }
+
+  add(position, item) {
+    this.#items[position] = item;
+  }
+
+  map(mapper) {
+    return Object.fromEntries(Object.entries(this.#items).map(([key, value]) => mapper(Position.parse(key), value)));
+  }
+
+  forEach(visitor) {
+    Object.entries(this.#items).map(([key, value]) => visitor(Position.parse(key), value));
+  }
+
+}
+
+class BoardState {
+  #fruit;
+  #snake;
+  #walls;
+  constructor({ fruit, snake }) {
+    this.#fruit = fruit;
+    this.#snake = snake;
+    this.#walls = [
+      new Position({ row: 5, column: 5 }),
+      new Position({ row: 5, column: 6 }),
+      new Position({ row: 5, column: 7 }),
+      new Position({ row: 5, column: 8 }),
+      new Position({ row: 5, column: 9 }),
+      new Position({ row: 5, column: 10 }),
+    ]
+  }
+
+  forEach(visitor) {
+    this.#fruit.forEach(visitor);
+    this.#snake.forEach(visitor);
+    this.#walls.forEach(position => visitor(position, SPRITE.wall));
+  }
+
+  static initial() {
+    const fruit = new IndexedItems([
+      { position: new Position({ row: Math.round(Math.random() * DIMENSIONS.height - 1), column: Math.round(Math.random() * DIMENSIONS.width - 1) }), item: SPRITE.fruit.random },
+      { position: new Position({ row: Math.round(Math.random() * DIMENSIONS.height - 1), column: Math.round(Math.random() * DIMENSIONS.width - 1) }), item: SPRITE.fruit.random },
+      { position: new Position({ row: Math.round(Math.random() * DIMENSIONS.height - 1), column: Math.round(Math.random() * DIMENSIONS.width - 1) }), item: SPRITE.fruit.random },
+      { position: new Position({ row: Math.round(Math.random() * DIMENSIONS.height - 1), column: Math.round(Math.random() * DIMENSIONS.width - 1) }), item: SPRITE.fruit.random },
+    ]);
+    const snake = new IndexedItems([
+      { position: new Position({ row: 3, column: 10 }), item: SPRITE.head },
+      { position: new Position({ row: 3, column: 9 }), item: SPRITE.body },
+      { position: new Position({ row: 3, column: 8 }), item: SPRITE.body },
+      { position: new Position({ row: 3, column: 7 }), item: SPRITE.body },
+      { position: new Position({ row: 3, column: 6 }), item: SPRITE.body },
+      { position: new Position({ row: 3, column: 5 }), item: SPRITE.body },
+    ]);
+    return new BoardState({
+      fruit,
+      snake
+    })
+  }
+}
 
 function main() {
   const element = document.querySelector('#main');
@@ -50,8 +139,17 @@ function gameLoopTick() {
 }
 
 function getNextBoard() {
-  nthTick = (nthTick + 1) % cannedBoards.length;
-  return cannedBoards[nthTick];
+  const state = BoardState.initial();
+  const board = generateEmptyBoard()
+  state.forEach((position, item) => {
+    console.log({ row: position.row, column: position.column, item });
+    if (!item) {
+      console.error('missing item', position, item)
+    } else {
+      board[position.row][position.column] = item;
+    }
+  });
+  return board;
 }
 
 function updateBoard(board) {
@@ -67,19 +165,8 @@ function updateBoard(board) {
   });
 }
 
-function generateBoard(n) {
-  const newBoard = Array.from({ length: DIMENSIONS.height }).map(() => 
-    Array.from({ length: DIMENSIONS.width }).map(() => null)
-    );
-  const snakeHead = n + 5;
-  newBoard[3][withinBoardWidth(snakeHead)] = SPRITE.head
-  newBoard[3][withinBoardWidth(snakeHead - 1)] = SPRITE.body
-  newBoard[3][withinBoardWidth(snakeHead - 2)] = SPRITE.body
-  newBoard[3][withinBoardWidth(snakeHead - 3)] = SPRITE.body
-  newBoard[3][withinBoardWidth(snakeHead - 4)] = SPRITE.body
-  newBoard[3][withinBoardWidth(snakeHead - 5)] = SPRITE.body
-  newBoard[8][9] = SPRITE.fruit.random
-  return newBoard;
+function generateEmptyBoard() {
+  return Array.from({ length: DIMENSIONS.height }).map(() => Array.from({ length: DIMENSIONS.width }).map(() => null));
 }
 
 function withinBoardWidth(x) {
