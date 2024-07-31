@@ -71,21 +71,27 @@ class Position {
 }
 
 class Direction {
-  static RIGHT = new Direction(({ row, column }) => ({ row, column: column + 1 }), () => Direction.LEFT);
-  static LEFT = new Direction(({ row, column }) => ({ row, column: column - 1 }), () => Direction.RIGHT);
-  static DOWN = new Direction(({ row, column }) => ({ row: row + 1, column }), () => Direction.UP);
-  static UP = new Direction(({ row, column }) => ({ row: row - 1, column }), () => Direction.DOWN);
+  static RIGHT = new Direction('90deg', ({ row, column }) => ({ row, column: column + 1 }), () => Direction.LEFT);
+  static LEFT = new Direction('270deg', ({ row, column }) => ({ row, column: column - 1 }), () => Direction.RIGHT);
+  static DOWN = new Direction('180deg', ({ row, column }) => ({ row: row + 1, column }), () => Direction.UP);
+  static UP = new Direction('0deg', ({ row, column }) => ({ row: row - 1, column }), () => Direction.DOWN);
 
+  #orientation;
   #transform;
   #opposite
 
-  constructor(transform, opposite) {
+  constructor(orientation, transform, opposite) {
+    this.#orientation = orientation;
     this.#transform = transform;
     this.#opposite = opposite;
   }
 
   get opposite() {
     return this.#opposite();
+  }
+
+  get orientationInCssUnits() {
+    return this.#orientation;
   }
 
   move(position) {
@@ -133,6 +139,10 @@ class Snake {
     this.#length = length;
     this.#direction = direction;
     this.#tail = tail || Snake.generateTail({ head: position, length, direction: direction.opposite });
+  }
+
+  get directionInCssUnits() {
+    return this.#direction.orientationInCssUnits;
   }
 
   move() {
@@ -193,6 +203,10 @@ class BoardState {
     this.#walls.forEach(position => visitor(position, Sprite.WALL));
   }
 
+  get snakeDirectionInCssUnits() {
+    return this.#snake.directionInCssUnits;
+  }
+
   mutate(modifier) {
     const updates = modifier({
       fruit: this.#fruit,
@@ -244,6 +258,7 @@ function gameLoop() {
   });
   const eachTick = () => {
     state = gameLoopTick(state);
+    document.body.style.setProperty('--snake-orientation', state.snakeDirectionInCssUnits);
   };
   setInterval(eachTick, GAME_SPEED);
   eachTick();

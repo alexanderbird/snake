@@ -31,7 +31,7 @@ td {
   color: teal;
 }
 [data-sprite-type="snake-head"] {
-  transform: rotate(135deg);
+  transform: rotate(calc(45deg + var(--snake-orientation)));
 }
 
 [data-sprite-type="edible"] {
