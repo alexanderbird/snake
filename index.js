@@ -3,6 +3,23 @@ const DIMENSIONS = {
   width: 50,
   height: 50,
 }
+const SPRITE = {
+  head: '⬤',
+  body: '●',
+  fruit: {
+    lemon: '🍋',
+    grapes: '🍇',
+    strawberry: '🍓',
+    cherries: '🍒',
+    get all() {
+      return Object.keys(SPRITE.fruit).filter(x => x !== 'all' && x !== 'random').map(key => SPRITE.fruit[key])
+    },
+    get random() {
+      const index = Math.floor(Math.random() * SPRITE.fruit.all.length);
+      return SPRITE.fruit.all[index]
+    }
+  }
+}
 const cannedBoards = Array.from({ length: DIMENSIONS.width }).map((_, i) => generateBoard(i));
 
 let nthTick = 0;
@@ -37,8 +54,6 @@ function getNextBoard() {
   return cannedBoards[nthTick];
 }
 
-
-
 function updateBoard(board) {
   board.forEach((columns, row) => {
     columns.forEach((value, column) => {
@@ -57,10 +72,13 @@ function generateBoard(n) {
     Array.from({ length: DIMENSIONS.width }).map(() => null)
     );
   const snakeHead = n + 5;
-  newBoard[3][withinBoardWidth(snakeHead)] = 'H'
-  newBoard[3][withinBoardWidth(snakeHead - 1)] = 'B'
-  newBoard[3][withinBoardWidth(snakeHead - 2)] = 'B'
-  newBoard[3][withinBoardWidth(snakeHead - 3)] = 'B'
+  newBoard[3][withinBoardWidth(snakeHead)] = SPRITE.head
+  newBoard[3][withinBoardWidth(snakeHead - 1)] = SPRITE.body
+  newBoard[3][withinBoardWidth(snakeHead - 2)] = SPRITE.body
+  newBoard[3][withinBoardWidth(snakeHead - 3)] = SPRITE.body
+  newBoard[3][withinBoardWidth(snakeHead - 4)] = SPRITE.body
+  newBoard[3][withinBoardWidth(snakeHead - 5)] = SPRITE.body
+  newBoard[8][9] = SPRITE.fruit.random
   return newBoard;
 }
 
