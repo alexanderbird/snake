@@ -183,6 +183,15 @@ class Snake {
     return this.#direction.orientationInCssUnits;
   }
 
+  grow() {
+    return new Snake({
+      position: this.#position,
+      direction: this.#direction,
+      length: this.#length,
+      tail: [null, ...this.#tail],
+    });
+  }
+
   move() {
     return new Snake({
       position: this.#direction.move(this.#position),
@@ -329,7 +338,7 @@ function gameLoopTick(state) {
 
 function nextBoardState(previousState) {
   return previousState.mutate(({ snake, fruit }) => {
-    let newSnake = snake.move();
+    let newSnake = snake;
     let newFruit = fruit;
     previousState.handleCollisions(({ position, item }) => {
       console.log('Collision with ' + item);
@@ -344,13 +353,14 @@ function nextBoardState(previousState) {
           break;
         case SpriteType.EDIBLE:
           newFruit = fruit.remove(position);
-          console.log('TODO: grow snake');
+          newSnake = newSnake.grow();
           break;
         default:
           console.error('Unsupported Sprite Type: ' + item.type);
           break;
       }
     });
+    newSnake = newSnake.move();
     return {
       snake: newSnake,
       fruit: newFruit,
