@@ -97,6 +97,12 @@ body #end-game-screen .content table td:first-child {
   font-weight: bold;
   text-align: right;
 }
+body[data-game-over="win"] #game-results-title-lose {
+  display: none;
+}
+body[data-game-over="lose"] #game-results-title-win {
+  display: none;
+}
 #game-results-fruit:after {
   content: var(--game-results-fruit);
 }

@@ -342,20 +342,26 @@ function gameLoop() {
   document.body.addEventListener('keydown', event => {
     state = handleKeyPress(event, state);
   });
+  let gameOver = false;
+  const triggerEndGame = () => { gameOver = true }
   const endGame = () => {
     if (gameInterval) {
       clearInterval(gameInterval);
     }
-    document.body.dataset.gameOver = true
-    document.body.style.setProperty('--game-results-time', '"' + elapsedTime(startTime) + '"');
     const stats = state.statistics;
+    document.body.dataset.gameOver = stats.remainingFruit === 0 ? 'win' : 'lose'
+    document.body.style.setProperty('--game-results-time', '"' + elapsedTime(startTime) + '"');
     document.body.style.setProperty('--game-results-length', '"' + stats.snakeLength + '"');
     document.body.style.setProperty('--game-results-fruit', '"' + stats.fruit + '"');
     document.body.style.setProperty('--game-results-remaining', '"' + stats.remainingFruit + '"');
   }
   const eachTick = () => {
-    state = gameLoopTick(state, endGame);
-    document.body.style.setProperty('--snake-orientation', state.snakeDirectionInCssUnits);
+    if (gameOver === true) {
+      endGame();
+    } else {
+      state = gameLoopTick(state, triggerEndGame);
+      document.body.style.setProperty('--snake-orientation', state.snakeDirectionInCssUnits);
+    }
   };
   const gameInterval = setInterval(eachTick, GAME_SPEED);
   eachTick();
@@ -388,18 +394,19 @@ function nextBoardState(previousState, endGame) {
       switch (item.type) {
         case SpriteType.SNAKE_BODY:
           endGame();
-          console.log('Game Over');
           newSnake = Snake.NULL;
           break;
         case SpriteType.OBSTACLE:
           endGame();
-          console.log('Game Over');
           newSnake = Snake.NULL;
           break;
         case SpriteType.EDIBLE:
           newFruit = fruit.remove(position);
           newSnake = newSnake.grow();
           newStatistics = { ...newStatistics, fruit: newStatistics.fruit + 1 };
+          if (newFruit.size === 0) {
+            endGame();
+          }
           break;
         default:
           console.error('Unsupported Sprite Type: ' + item.type);
