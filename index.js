@@ -1,4 +1,5 @@
 const GAME_SPEED = 100;
+const FRUIT_SPAWN_LIKELIHOOD = 0.02;
 const DIMENSIONS = {
   width: 50,
   height: 40,
@@ -134,11 +135,15 @@ class Direction {
 class IndexedItems {
   #items;
   constructor(items = []) {
-    this.#items = Object.fromEntries(items.map(({ position, item }) => [position, item]));
+    if (Array.isArray(items)) {
+      this.#items = Object.fromEntries(items.map(({ position, item }) => [position, item]));
+    } else {
+      this.#items = items;
+    }
   }
 
   add(position, item) {
-    this.#items[position] = item;
+    return new IndexedItems({ ...this.#items, [position]: item });
   }
 
   map(mapper) {
@@ -277,10 +282,10 @@ class BoardState {
 
   static initial() {
     const fruit = new IndexedItems([
-      BoardState.#generateRandomFruit(),
-      BoardState.#generateRandomFruit(),
-      BoardState.#generateRandomFruit(),
-      BoardState.#generateRandomFruit(),
+      generateRandomFruit(),
+      generateRandomFruit(),
+      generateRandomFruit(),
+      generateRandomFruit(),
     ]);
     const snake = new Snake({ direction: Direction.RIGHT, length: 4, position: new Position({ row: 3, column: 10 }) });
     const walls = Array.from({ length: DIMENSIONS.width })
@@ -293,12 +298,6 @@ class BoardState {
     })
   }
 
-  static #generateRandomFruit() {
-    return {
-      position: new Position({ row: Math.floor(Math.random() * DIMENSIONS.height), column: Math.floor(Math.random() * DIMENSIONS.width) }),
-      item: Fruit.random
-    }
-  }
 }
 
 function main() {
@@ -340,6 +339,10 @@ function nextBoardState(previousState) {
   return previousState.mutate(({ snake, fruit }) => {
     let newSnake = snake;
     let newFruit = fruit;
+    if (Math.random() < FRUIT_SPAWN_LIKELIHOOD) {
+      const { position, item } = generateRandomFruit()
+      newFruit = fruit.add(position, item);
+    }
     previousState.handleCollisions(({ position, item }) => {
       console.log('Collision with ' + item);
       switch (item.type) {
@@ -408,6 +411,13 @@ function generateEmptyBoard() {
 
 function withinBoardWidth(x) {
   return (x % DIMENSIONS.width)
+}
+
+function generateRandomFruit() {
+  return {
+    position: new Position({ row: Math.floor(Math.random() * DIMENSIONS.height), column: Math.floor(Math.random() * DIMENSIONS.width) }),
+    item: Fruit.random
+  }
 }
 
 function handleKeyPress(event, state) {
