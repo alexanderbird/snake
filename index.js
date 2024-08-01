@@ -60,6 +60,10 @@ class Position {
     return this.#column;
   }
 
+  equals(other) {
+    return this.#row === other.row && this.#column === other.column;
+  }
+
   static parse(string) {
     const { row, column } = JSON.parse(string);
     return new Position({ row, column });
@@ -141,6 +145,10 @@ class Snake {
     this.#tail = tail || Snake.generateTail({ head: position, length, direction: direction.opposite });
   }
 
+  get headPosition() {
+    return this.#position;
+  }
+
   get directionInCssUnits() {
     return this.#direction.orientationInCssUnits;
   }
@@ -201,6 +209,15 @@ class BoardState {
     this.#fruit.forEach(visitor);
     this.#snake.forEach(visitor);
     this.#walls.forEach(position => visitor(position, Sprite.WALL));
+  }
+
+  handleCollisions(visitor) {
+    const snakeHead = this.#snake.headPosition;
+    this.forEach((position, item) => {
+      if (snakeHead.equals(position) && item !== Sprite.HEAD) {
+        visitor(item);
+      }
+    });
   }
 
   get snakeDirectionInCssUnits() {
@@ -279,8 +296,12 @@ function gameLoopTick(state) {
 
 function nextBoardState(previousState) {
   return previousState.mutate(({ snake }) => {
+    let newSnake = snake.move();
+    previousState.handleCollisions(item => {
+      console.log('Collision with ' + item);
+    });
     return {
-      snake: snake.move()
+      snake: newSnake
     }
   });
 }
