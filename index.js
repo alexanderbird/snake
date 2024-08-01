@@ -4,15 +4,32 @@ const DIMENSIONS = {
   height: 40,
 }
 
+class SpriteType {
+  static EMPTY = new SpriteType('empty');
+  static SNAKE_HEAD = new SpriteType('snake-head');
+  static SNAKE_BODY = new SpriteType('snake-body');
+  static OBSTACLE = new SpriteType('obstacle');
+  static EDIBLE = new SpriteType('edible');
+  #value
+
+  constructor(value) {
+    this.#value = value;
+  }
+
+  toString() {
+    return this.#value;
+  }
+}
+
 class Sprite {
-  static EMPTY = new Sprite('empty', '');
-  static HEAD = new Sprite('snake-head', '⫙');
-  static BODY = new Sprite('snake-body', '●');
-  static WALL = new Sprite('obstacle', '▩');
-  static LEMON = new Sprite('edible', '🍋');
-  static GRAPES = new Sprite('edible', '🍇');
-  static STRAWBERRY = new Sprite('edible', '🍓');
-  static CHERRIES = new Sprite('edible', '🍒');
+  static EMPTY = new Sprite(SpriteType.EMPTY, '');
+  static HEAD = new Sprite(SpriteType.SNAKE_HEAD, '⫙');
+  static BODY = new Sprite(SpriteType.SNAKE_BODY, '●');
+  static WALL = new Sprite(SpriteType.OBSTACLE, '▩');
+  static LEMON = new Sprite(SpriteType.EDIBLE, '🍋');
+  static GRAPES = new Sprite(SpriteType.EDIBLE, '🍇');
+  static STRAWBERRY = new Sprite(SpriteType.EDIBLE, '🍓');
+  static CHERRIES = new Sprite(SpriteType.EDIBLE, '🍒');
 
   #type;
   #character;
@@ -131,6 +148,13 @@ class IndexedItems {
   forEach(visitor) {
     Object.entries(this.#items).map(([key, value]) => visitor(Position.parse(key), value));
   }
+
+  remove(position) {
+    const updatedItems = Object.entries(this.#items)
+      .map(([ position, item ]) => ({ position: Position.parse(position), item }))
+      .filter(x => !position.equals(x.position))
+    return new IndexedItems(updatedItems);
+  }
 }
 
 class Snake {
@@ -144,6 +168,12 @@ class Snake {
     this.#direction = direction;
     this.#tail = tail || Snake.generateTail({ head: position, length, direction: direction.opposite });
   }
+
+  static NULL = new Snake({
+    position: new Position({ row: 0, column: 0 }),
+    length: 0,
+    direction: Direction.RIGHT
+  });
 
   get headPosition() {
     return this.#position;
@@ -180,6 +210,9 @@ class Snake {
   }
 
   forEach(visitor) {
+    if (!this.#length) {
+      return;
+    }
     visitor(this.#position, Sprite.HEAD);
     this.#tail.forEach(x => visitor(x, Sprite.BODY));
   }
@@ -215,7 +248,7 @@ class BoardState {
     const snakeHead = this.#snake.headPosition;
     this.forEach((position, item) => {
       if (snakeHead.equals(position) && item !== Sprite.HEAD) {
-        visitor(item);
+        visitor({ item, position });
       }
     });
   }
@@ -295,13 +328,32 @@ function gameLoopTick(state) {
 }
 
 function nextBoardState(previousState) {
-  return previousState.mutate(({ snake }) => {
+  return previousState.mutate(({ snake, fruit }) => {
     let newSnake = snake.move();
-    previousState.handleCollisions(item => {
+    let newFruit = fruit;
+    previousState.handleCollisions(({ position, item }) => {
       console.log('Collision with ' + item);
+      switch (item.type) {
+        case SpriteType.SNAKE_BODY:
+          console.log('Game Over');
+          newSnake = Snake.NULL;
+          break;
+        case SpriteType.OBSTACLE:
+          console.log('Game Over');
+          newSnake = Snake.NULL;
+          break;
+        case SpriteType.EDIBLE:
+          newFruit = fruit.remove(position);
+          console.log('TODO: grow snake');
+          break;
+        default:
+          console.error('Unsupported Sprite Type: ' + item.type);
+          break;
+      }
     });
     return {
-      snake: newSnake
+      snake: newSnake,
+      fruit: newFruit,
     }
   });
 }
