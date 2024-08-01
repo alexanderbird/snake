@@ -1,5 +1,5 @@
 const GAME_SPEED = 100;
-const FRUIT_SPAWN_LIKELIHOOD = 0.02;
+let FRUIT_SPAWN_LIKELIHOOD = 0.02;
 const DIMENSIONS = {
   width: 50,
   height: 40,
@@ -387,6 +387,7 @@ function nextBoardState(previousState, endGame) {
     let newFruit = fruit;
     let newStatistics = statistics;
     if (Math.random() < FRUIT_SPAWN_LIKELIHOOD) {
+      FRUIT_SPAWN_LIKELIHOOD += 0.005;
       const { position, item } = generateRandomFruit()
       newFruit = fruit.add(position, item);
     }
