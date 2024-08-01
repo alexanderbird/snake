@@ -1,10 +1,49 @@
-const GAME_SPEED = 100;
-let FRUIT_SPAWN_LIKELIHOOD = 0.02;
-const INITIAL_FRUIT_COUNT = Math.round(Math.random() * 5) + 30;
+const LEVELS = [
+  { speed: 150, spawn: 0, spawnRamp: 0, fruit: around(3).plusOrMinus(1) },
+  { speed: 150, spawn: 0.02, spawnRamp: 0, fruit: around(3).plusOrMinus(1) },
+  { speed: 100, spawn: 0.02, spawnRamp: 0, fruit: around(3).plusOrMinus(1) },
+  { speed: 100, spawn: 0.02, spawnRamp: 0.001, fruit: around(3).plusOrMinus(1) },
+  { speed: 100, spawn: 0.02, spawnRamp: 0.0005, fruit: around(10).plusOrMinus(4) },
+  { speed: 100, spawn: 0.02, spawnRamp: 0.0005, fruit: around(10).plusOrMinus(5) },
+  { speed: 90, spawn: 0.02, spawnRamp: 0.0005, fruit: around(20).plusOrMinus(5) },
+  { speed: 80, spawn: 0.02, spawnRamp: 0.0005, fruit: around(20).plusOrMinus(5) },
+  { speed: 80, spawn: 0.02, spawnRamp: 0.0005, fruit: around(40).plusOrMinus(5) },
+  { speed: 80, spawn: 0.025, spawnRamp: 0.001, fruit: around(40).plusOrMinus(5) },
+]
+
+function generateVeryDifficultGame(level) {
+  const game = LEVELS[LEVELS.length - 1];
+  return {
+    ...game,
+    speed: Math.max(100 - (3 * level), 30),
+    fruit: around(30 + 2 * level).plusOrMinus(level)
+  }
+}
+
+const GAME = LEVELS[currentLevel()] || generateVeryDifficultGame(currentLevel());
+const GAME_SPEED = GAME.speed;
+const INITIAL_FRUIT_SPAWN_LIKELIHOOD = GAME.spawn;
+const FRUIT_SPAWN_LIKELIHOOD_INCREASE_RATE = GAME.spawnRamp;
+const INITIAL_FRUIT_COUNT = GAME.fruit;
+
+function currentLevel() {
+  return Number(window.localStorage.getItem('level')) || 0;
+}
+function increaseCurrentLevel() {
+  window.localStorage.setItem('level', currentLevel() + 1);
+}
+
+function around(base) {
+  return {
+    plusOrMinus: range => Math.round((range / -2) + Math.random() * range * 2) + base,
+  }
+}
+
 const DIMENSIONS = {
   width: 50,
   height: 40,
 }
+let FRUIT_SPAWN_LIKELIHOOD = INITIAL_FRUIT_SPAWN_LIKELIHOOD;
 
 class SpriteType {
   static EMPTY = new SpriteType('empty');
@@ -186,8 +225,7 @@ class Snake {
   });
 
   get length() {
-    const headLength = 1;
-    return this.#length + headLength;
+    return this.#length;
   }
 
   get headPosition() {
@@ -334,6 +372,7 @@ class BoardState {
 }
 
 function main() {
+  document.body.style.setProperty('--game-current-level', '"' + (currentLevel() + 1) + '"');
   const element = document.querySelector('#main');
   let html = '';
   html += '<table>'
@@ -362,7 +401,11 @@ function gameLoop() {
       clearInterval(gameInterval);
     }
     const stats = state.statistics;
-    document.body.dataset.gameOver = stats.remainingFruit === 0 ? 'win' : 'lose'
+    const win = stats.remainingFruit === 0;
+    if (win) {
+      increaseCurrentLevel();
+    }
+    document.body.dataset.gameOver = win ? 'win' : 'lose'
     document.body.style.setProperty('--game-results-time', '"' + elapsedTime(startTime) + '"');
     document.body.style.setProperty('--game-results-length', '"' + stats.snakeLength + '"');
     document.body.style.setProperty('--game-results-fruit', '"' + stats.fruit + '"');
@@ -400,7 +443,7 @@ function nextBoardState(previousState, endGame) {
     let newFruit = fruit;
     let newStatistics = statistics;
     if (Math.random() < FRUIT_SPAWN_LIKELIHOOD) {
-      FRUIT_SPAWN_LIKELIHOOD += 0.001;
+      FRUIT_SPAWN_LIKELIHOOD += FRUIT_SPAWN_LIKELIHOOD_INCREASE_RATE;
       const { position, item } = generateRandomFruit(previousState.walls)
       newFruit = fruit.add(position, item);
     }
@@ -408,11 +451,9 @@ function nextBoardState(previousState, endGame) {
       switch (item.type) {
         case SpriteType.SNAKE_BODY:
           endGame();
-          newSnake = Snake.NULL;
           break;
         case SpriteType.OBSTACLE:
           endGame();
-          newSnake = Snake.NULL;
           break;
         case SpriteType.EDIBLE:
           newFruit = fruit.remove(position);

@@ -61,10 +61,15 @@ body:not([data-game-over]) #end-game-screen {
 body {
   position: relative;
 }
+
+h2 {
+  text-align: center;
+}
+
 body #main,
 body #end-game-screen {
   position: absolute;
-  top: 0;
+  top: 40px;
   right: 0;
   bottom: 0;
   left: 0;
@@ -76,6 +81,15 @@ body #end-game-screen {
   text-transform: uppercase;
   font-size: 3em;
 }
+#end-game-screen table {
+  margin-bottom: 16px;
+}
+#end-game-screen .footer {
+  text-transform: unset;
+  font-size: 0.3em;
+  text-align: center;
+}
+
 body #end-game-screen .content {
   margin: auto;
 }
@@ -103,6 +117,9 @@ body[data-game-over="win"] #game-results-title-lose {
 body[data-game-over="lose"] #game-results-title-win {
   display: none;
 }
+body[data-game-over="lose"] #end-game-screen .footer {
+  display: none;
+}
 #game-results-fruit:after {
   content: var(--game-results-fruit);
 }
@@ -114,4 +131,7 @@ body[data-game-over="lose"] #game-results-title-win {
 }
 #game-results-time:after {
   content: var(--game-results-time);
+}
+#snake-level:after {
+  content: var(--game-current-level);
 }
