@@ -142,6 +142,10 @@ class IndexedItems {
     }
   }
 
+  get size() {
+    return Object.keys(this.#items).length;
+  }
+
   add(position, item) {
     return new IndexedItems({ ...this.#items, [position]: item });
   }
@@ -180,6 +184,11 @@ class Snake {
     direction: Direction.RIGHT
   });
 
+  get length() {
+    const headLength = 1;
+    return this.#length + headLength;
+  }
+
   get headPosition() {
     return this.#position;
   }
@@ -192,7 +201,7 @@ class Snake {
     return new Snake({
       position: this.#position,
       direction: this.#direction,
-      length: this.#length,
+      length: this.#length + 1,
       tail: [null, ...this.#tail],
     });
   }
@@ -246,10 +255,12 @@ class BoardState {
   #fruit;
   #snake;
   #walls;
-  constructor({ fruit, snake, walls }) {
+  #statistics
+  constructor({ fruit, snake, walls, statistics }) {
     this.#fruit = fruit;
     this.#snake = snake;
     this.#walls = walls;
+    this.#statistics = { fruit: 0, ...statistics };
   }
 
   forEach(visitor) {
@@ -267,6 +278,14 @@ class BoardState {
     });
   }
 
+  get statistics() {
+    return {
+      ...this.#statistics,
+      remainingFruit: this.#fruit.size,
+      snakeLength: this.#snake.length,
+    }
+  }
+
   get snakeDirectionInCssUnits() {
     return this.#snake.directionInCssUnits;
   }
@@ -276,8 +295,9 @@ class BoardState {
       fruit: this.#fruit,
       snake: this.#snake,
       walls: this.#walls,
+      statistics: this.#statistics,
     });
-    return new BoardState({ fruit: this.#fruit, snake: this.#snake, walls: this.#walls, ...updates });
+    return new BoardState({ fruit: this.#fruit, snake: this.#snake, walls: this.#walls, statistics: this.#statistics, ...updates });
   }
 
   static initial() {
@@ -318,45 +338,68 @@ function main() {
 
 function gameLoop() {
   let state = BoardState.initial();
+  const startTime = Date.now();
   document.body.addEventListener('keydown', event => {
     state = handleKeyPress(event, state);
   });
+  const endGame = () => {
+    if (gameInterval) {
+      clearInterval(gameInterval);
+    }
+    document.body.dataset.gameOver = true
+    document.body.style.setProperty('--game-results-time', '"' + elapsedTime(startTime) + '"');
+    const stats = state.statistics;
+    document.body.style.setProperty('--game-results-length', '"' + stats.snakeLength + '"');
+    document.body.style.setProperty('--game-results-fruit', '"' + stats.fruit + '"');
+    document.body.style.setProperty('--game-results-remaining', '"' + stats.remainingFruit + '"');
+  }
   const eachTick = () => {
-    state = gameLoopTick(state);
+    state = gameLoopTick(state, endGame);
     document.body.style.setProperty('--snake-orientation', state.snakeDirectionInCssUnits);
   };
-  setInterval(eachTick, GAME_SPEED);
+  const gameInterval = setInterval(eachTick, GAME_SPEED);
   eachTick();
 }
 
-
-function gameLoopTick(state) {
-  updateBoard(getNextBoard(state));
-  return nextBoardState(state);
+function elapsedTime(startTime) {
+  const endTime = Date.now();
+  const totalSeconds = Math.round((endTime - startTime) / 1000);
+  const minutes = Math.floor(totalSeconds / 60)
+  const seconds = totalSeconds % 60;
+  return `${minutes}:${seconds.toString().padStart(2, '0')}`;
 }
 
-function nextBoardState(previousState) {
-  return previousState.mutate(({ snake, fruit }) => {
+
+function gameLoopTick(state, endGame) {
+  updateBoard(getNextBoard(state));
+  return nextBoardState(state, endGame);
+}
+
+function nextBoardState(previousState, endGame) {
+  return previousState.mutate(({ snake, fruit, statistics }) => {
     let newSnake = snake;
     let newFruit = fruit;
+    let newStatistics = statistics;
     if (Math.random() < FRUIT_SPAWN_LIKELIHOOD) {
       const { position, item } = generateRandomFruit()
       newFruit = fruit.add(position, item);
     }
     previousState.handleCollisions(({ position, item }) => {
-      console.log('Collision with ' + item);
       switch (item.type) {
         case SpriteType.SNAKE_BODY:
+          endGame();
           console.log('Game Over');
           newSnake = Snake.NULL;
           break;
         case SpriteType.OBSTACLE:
+          endGame();
           console.log('Game Over');
           newSnake = Snake.NULL;
           break;
         case SpriteType.EDIBLE:
           newFruit = fruit.remove(position);
           newSnake = newSnake.grow();
+          newStatistics = { ...newStatistics, fruit: newStatistics.fruit + 1 };
           break;
         default:
           console.error('Unsupported Sprite Type: ' + item.type);
@@ -365,6 +408,7 @@ function nextBoardState(previousState) {
     });
     newSnake = newSnake.move();
     return {
+      statistics: newStatistics,
       snake: newSnake,
       fruit: newFruit,
     }
