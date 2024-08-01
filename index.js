@@ -278,6 +278,10 @@ class BoardState {
     });
   }
 
+  get walls() {
+    return this.#walls;
+  }
+
   get statistics() {
     return {
       ...this.#statistics,
@@ -301,16 +305,29 @@ class BoardState {
   }
 
   static initial() {
+    const walls = [
+      ...Array.from({ length: DIMENSIONS.width })
+        .map((_, i) => new Position({ row: 5, column: i }))
+        .filter(x => x.column > 4 && x.column < DIMENSIONS.width - 4),
+      ...Array.from({ length: DIMENSIONS.width })
+        .map((_, i) => new Position({ row: 10, column: i }))
+        .filter(x => x.column > 4 && x.column < DIMENSIONS.width - 4),
+      ...Array.from({ length: 10 })
+        .map((_, i) => new Position({ row: Math.round(DIMENSIONS.height / 2) - 5 + i, column: Math.round(DIMENSIONS.width / 2) })),
+      ...Array.from({ length: DIMENSIONS.width })
+        .map((_, i) => new Position({ row: DIMENSIONS.height - 10, column: i }))
+        .filter(x => x.column > 4 && x.column < DIMENSIONS.width - 4),
+      ...Array.from({ length: DIMENSIONS.width })
+        .map((_, i) => new Position({ row: DIMENSIONS.height - 5, column: i }))
+        .filter(x => x.column > 4 && x.column < DIMENSIONS.width - 4),
+    ];
     const fruit = new IndexedItems([
-      generateRandomFruit(),
-      generateRandomFruit(),
-      generateRandomFruit(),
-      generateRandomFruit(),
+      generateRandomFruit(walls),
+      generateRandomFruit(walls),
+      generateRandomFruit(walls),
+      generateRandomFruit(walls),
     ]);
     const snake = new Snake({ direction: Direction.RIGHT, length: 4, position: new Position({ row: 3, column: 10 }) });
-    const walls = Array.from({ length: DIMENSIONS.width })
-      .map((_, i) => new Position({ row: 5, column: i }))
-      .filter(x => x.column > 4 && x.column < DIMENSIONS.width - 4);
     return new BoardState({
       fruit,
       snake,
@@ -388,7 +405,7 @@ function nextBoardState(previousState, endGame) {
     let newStatistics = statistics;
     if (Math.random() < FRUIT_SPAWN_LIKELIHOOD) {
       FRUIT_SPAWN_LIKELIHOOD += 0.005;
-      const { position, item } = generateRandomFruit()
+      const { position, item } = generateRandomFruit(previousState.walls)
       newFruit = fruit.add(position, item);
     }
     previousState.handleCollisions(({ position, item }) => {
@@ -465,9 +482,13 @@ function withinBoardWidth(x) {
   return (x % DIMENSIONS.width)
 }
 
-function generateRandomFruit() {
+function generateRandomFruit(walls) {
+  let position;
+  do {
+    position = new Position({ row: Math.floor(Math.random() * DIMENSIONS.height), column: Math.floor(Math.random() * DIMENSIONS.width) });
+  } while (walls.find(x => x.equals(position)));
   return {
-    position: new Position({ row: Math.floor(Math.random() * DIMENSIONS.height), column: Math.floor(Math.random() * DIMENSIONS.width) }),
+    position,
     item: Fruit.random
   }
 }
