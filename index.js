@@ -218,10 +218,10 @@ class BoardState {
 
   static initial() {
     const fruit = new IndexedItems([
-      { position: new Position({ row: Math.floor(Math.random() * DIMENSIONS.height), column: Math.floor(Math.random() * DIMENSIONS.width) }), item: Fruit.random },
-      { position: new Position({ row: Math.floor(Math.random() * DIMENSIONS.height), column: Math.floor(Math.random() * DIMENSIONS.width) }), item: Fruit.random },
-      { position: new Position({ row: Math.floor(Math.random() * DIMENSIONS.height), column: Math.floor(Math.random() * DIMENSIONS.width) }), item: Fruit.random },
-      { position: new Position({ row: Math.floor(Math.random() * DIMENSIONS.height), column: Math.floor(Math.random() * DIMENSIONS.width) }), item: Fruit.random },
+      BoardState.#generateRandomFruit(),
+      BoardState.#generateRandomFruit(),
+      BoardState.#generateRandomFruit(),
+      BoardState.#generateRandomFruit(),
     ]);
     const snake = new Snake({ direction: Direction.RIGHT, length: 4, position: new Position({ row: 3, column: 10 }) });
     const walls = Array.from({ length: DIMENSIONS.width })
@@ -232,6 +232,13 @@ class BoardState {
       snake,
       walls
     })
+  }
+
+  static #generateRandomFruit() {
+    return {
+      position: new Position({ row: Math.floor(Math.random() * DIMENSIONS.height), column: Math.floor(Math.random() * DIMENSIONS.width) }),
+      item: Fruit.random
+    }
   }
 }
 
