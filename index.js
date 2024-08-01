@@ -1,5 +1,6 @@
 const GAME_SPEED = 100;
 let FRUIT_SPAWN_LIKELIHOOD = 0.02;
+const INITIAL_FRUIT_COUNT = Math.round(Math.random() * 5) + 30;
 const DIMENSIONS = {
   width: 50,
   height: 40,
@@ -321,12 +322,7 @@ class BoardState {
         .map((_, i) => new Position({ row: DIMENSIONS.height - 5, column: i }))
         .filter(x => x.column > 4 && x.column < DIMENSIONS.width - 4),
     ];
-    const fruit = new IndexedItems([
-      generateRandomFruit(walls),
-      generateRandomFruit(walls),
-      generateRandomFruit(walls),
-      generateRandomFruit(walls),
-    ]);
+    const fruit = new IndexedItems(Array.from({ length: INITIAL_FRUIT_COUNT }).map(() => generateRandomFruit(walls)));
     const snake = new Snake({ direction: Direction.RIGHT, length: 4, position: new Position({ row: 3, column: 10 }) });
     return new BoardState({
       fruit,
@@ -404,7 +400,7 @@ function nextBoardState(previousState, endGame) {
     let newFruit = fruit;
     let newStatistics = statistics;
     if (Math.random() < FRUIT_SPAWN_LIKELIHOOD) {
-      FRUIT_SPAWN_LIKELIHOOD += 0.005;
+      FRUIT_SPAWN_LIKELIHOOD += 0.001;
       const { position, item } = generateRandomFruit(previousState.walls)
       newFruit = fruit.add(position, item);
     }
