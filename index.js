@@ -9,12 +9,12 @@ const LEVELS = [
   { speed: 150, spawn: 0.02, spawnRamp: 0, fruit: around(3).plusOrMinus(1) },
   { speed: 100, spawn: 0.02, spawnRamp: 0, fruit: around(3).plusOrMinus(1) },
   { speed: 100, spawn: 0.02, spawnRamp: 0.0005, fruit: around(3).plusOrMinus(1) },
-  { speed: 100, spawn: 0.02, spawnRamp: 0.0005, fruit: around(10).plusOrMinus(4) },
-  { speed: 100, spawn: 0.02, spawnRamp: 0.0005, fruit: around(10).plusOrMinus(5) },
-  { speed: 90, spawn: 0.02, spawnRamp: 0.0005, fruit: around(20).plusOrMinus(5) },
-  { speed: 80, spawn: 0.02, spawnRamp: 0.0005, fruit: around(20).plusOrMinus(5) },
-  { speed: 80, spawn: 0.02, spawnRamp: 0.0005, fruit: around(40).plusOrMinus(5) },
-  { speed: 80, spawn: 0.025, spawnRamp: 0.001, fruit: around(40).plusOrMinus(5) },
+  { speed: 100, spawn: 0.02, spawnRamp: 0.0001, fruit: around(10).plusOrMinus(4) },
+  { speed: 100, spawn: 0.02, spawnRamp: 0.0001, fruit: around(10).plusOrMinus(5) },
+  { speed: 90, spawn: 0.02, spawnRamp: 0.0001, fruit: around(20).plusOrMinus(5) },
+  { speed: 80, spawn: 0.02, spawnRamp: 0.0001, fruit: around(20).plusOrMinus(5) },
+  { speed: 80, spawn: 0.02, spawnRamp: 0.0001, fruit: around(40).plusOrMinus(5) },
+  { speed: 80, spawn: 0.025, spawnRamp: 0.0001, fruit: around(40).plusOrMinus(5) },
 ]
 
 function generateVeryDifficultGame(level) {
