@@ -1,8 +1,14 @@
+const DIMENSIONS = {
+  width: 50,
+  height: 40,
+}
 const LEVELS = [
+  { speed: 300, spawn: 0, spawnRamp: 0, fruit: 2 },
+  { speed: 200, spawn: 0, spawnRamp: 0, fruit: 2 },
   { speed: 150, spawn: 0, spawnRamp: 0, fruit: around(3).plusOrMinus(1) },
   { speed: 150, spawn: 0.02, spawnRamp: 0, fruit: around(3).plusOrMinus(1) },
   { speed: 100, spawn: 0.02, spawnRamp: 0, fruit: around(3).plusOrMinus(1) },
-  { speed: 100, spawn: 0.02, spawnRamp: 0.001, fruit: around(3).plusOrMinus(1) },
+  { speed: 100, spawn: 0.02, spawnRamp: 0.0005, fruit: around(3).plusOrMinus(1) },
   { speed: 100, spawn: 0.02, spawnRamp: 0.0005, fruit: around(10).plusOrMinus(4) },
   { speed: 100, spawn: 0.02, spawnRamp: 0.0005, fruit: around(10).plusOrMinus(5) },
   { speed: 90, spawn: 0.02, spawnRamp: 0.0005, fruit: around(20).plusOrMinus(5) },
@@ -12,6 +18,9 @@ const LEVELS = [
 ]
 
 function generateVeryDifficultGame(level) {
+  if (level === 30) {
+    return { speed: 100, spawn: 0, spawnRamp: 0, fruit: DIMENSIONS.width * DIMENSIONS.height * 2 };
+  }
   const game = LEVELS[LEVELS.length - 1];
   return {
     ...game,
@@ -39,10 +48,6 @@ function around(base) {
   }
 }
 
-const DIMENSIONS = {
-  width: 50,
-  height: 40,
-}
 let FRUIT_SPAWN_LIKELIHOOD = INITIAL_FRUIT_SPAWN_LIKELIHOOD;
 
 class SpriteType {
