@@ -1,42 +1,138 @@
-table {
+body {
+  background-color: black;
+  color: white;
+  --cell-size: 18px;
+  --snake-head-offset-angle: 180deg;
+}
+
+#main table {
   border-collapse: collapse;
+  margin: auto;
 }
-table tr td {
+
+#main table td {
+  border: 1px solid black;
+  min-width: var(--cell-size);
+  max-width: var(--cell-size);
+  height: calc(var(--cell-size) + 1px);
+  line-height: var(--cell-size);
+  font-size: calc(var(--cell-size) + 4px);
+  margin: -2px;
+  overflow: visible;
+  text-align: center;
   padding: 0;
-}
-table tr td .cell {
-  border: 0.5px solid #0001;
-  width: 11px;
-  height: 11px;
+  background-color: #FFF1;
 }
 
-.cell {
+[data-sprite-type="obstacle"] {
+  color: #643;
 }
 
-.cell:not(.thing--snake-head) {
-  transition: background-color 2s;
+[data-sprite-type^="snake-"] {
+  color: teal;
+}
+[data-sprite-type="snake-head"] {
+  transform: rotate(calc(var(--snake-head-offset-angle) + var(--snake-orientation)));
 }
 
-.thing--snake-head {
-  background-color: blue;
+body:not([data-game-over]) [data-sprite-type="edible"] {
+  animation: pulse 1s;
+  animation-iteration-count: infinite;
 }
 
-.thing--wall {
-  background-color: gray;
+@keyframes pulse {
+  0% {
+    transform: scale(100%);
+  }
+  50% {
+    transform: scale(110%);
+  }
+  100% {
+    transform: scale(100%);
+  }
 }
 
-.thing--fruit {
-  font-size: 8px;
+body[data-game-over] #main {
+  filter: blur(4px);
+}
+body:not([data-game-over]) #end-game-screen {
+  display: none;
+}
+body {
+  position: relative;
 }
 
-.thing--fruit-apple:before {
-  content: '🍎';
+h2 {
+  text-align: center;
+  font-family: monospace;
 }
 
-.thing--fruit-blueberry:before {
-  content: '🫐';
+body #main,
+body #end-game-screen {
+  position: absolute;
+  top: 40px;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+body #end-game-screen {
+  display: flex;
+  height: 100vh;
+  font-family: monospace;
+  text-transform: uppercase;
+  font-size: 3em;
+}
+#end-game-screen table {
+  margin-bottom: 16px;
+}
+#end-game-screen .footer {
+  text-transform: unset;
+  font-size: 0.3em;
+  text-align: center;
 }
 
-.thing--fruit-lemon:before {
-  content: '🍋';
+body #end-game-screen .content {
+  margin: auto;
+}
+body #end-game-screen .content h3 {
+  margin-bottom: 0.5em;
+  text-align: center;
+}
+body #end-game-screen .content table {
+  border-collapse: collapse;
+  opacity: 0.8;
+  width: 100vw;
+}
+body #end-game-screen .content table td {
+  width: 50%;
+  border-right: 1em solid transparent;
+  border-left: 1em solid transparent;
+}
+body #end-game-screen .content table td:first-child {
+  font-weight: bold;
+  text-align: right;
+}
+body[data-game-over="win"] #game-results-title-lose {
+  display: none;
+}
+body[data-game-over="lose"] #game-results-title-win {
+  display: none;
+}
+body[data-game-over="lose"] #end-game-screen .footer {
+  display: none;
+}
+#game-results-fruit:after {
+  content: var(--game-results-fruit);
+}
+#game-results-remaining:after {
+  content: var(--game-results-remaining);
+}
+#game-results-length:after {
+  content: var(--game-results-length);
+}
+#game-results-time:after {
+  content: var(--game-results-time);
+}
+#snake-level:after {
+  content: var(--game-current-level);
 }

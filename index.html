@@ -1,12 +1,37 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Snake!</title>
-    <link rel='stylesheet' href='./index.css' type='text/css' />
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐍</text></svg>">
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href='./index.css'></link>
   </head>
   <body>
-    <script src="./index.js"></script>
-    <div id="game"></div>
+    <script src='./index.js'></script>
+    <h2>Snake Level <span id='snake-level'></h2>
+    <div id='main'></div>
+    <div id='end-game-screen'>
+      <div class='content'>
+        <h3 id='game-results-title-lose'>Game Over</h3>
+        <h3 id='game-results-title-win'>You Win</h3>
+        <table>
+          <tr>
+            <td>Time:</td>
+            <td id='game-results-time'></td>
+          </tr>
+          <tr>
+            <td>Length:</td>
+            <td id='game-results-length'></td>
+          </tr>
+          <tr>
+            <td>Eaten Fruit:</td>
+            <td id='game-results-fruit'></td>
+          </tr>
+          <tr>
+            <td>Remaining Fruit:</td>
+            <td id='game-results-remaining'></td>
+          </tr>
+        </table>
+        <p class='footer'>Refresh the page to proceed to the next level</p>
+      </div>
+    </div>
   </body>
 </html>
