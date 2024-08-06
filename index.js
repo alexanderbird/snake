@@ -1,3 +1,4 @@
+console.log('Open source at https://github.com/alexanderbird/snake');
 const DIMENSIONS = {
   width: 50,
   height: 40,
