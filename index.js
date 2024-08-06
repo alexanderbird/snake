@@ -8,13 +8,13 @@ const LEVELS = [
   { speed: 150, spawn: 0, spawnRamp: 0, fruit: around(3).plusOrMinus(1) },
   { speed: 150, spawn: 0.02, spawnRamp: 0, fruit: around(3).plusOrMinus(1) },
   { speed: 100, spawn: 0.02, spawnRamp: 0, fruit: around(3).plusOrMinus(1) },
-  { speed: 100, spawn: 0.02, spawnRamp: 0.0005, fruit: around(3).plusOrMinus(1) },
-  { speed: 100, spawn: 0.02, spawnRamp: 0.0001, fruit: around(10).plusOrMinus(4) },
-  { speed: 100, spawn: 0.02, spawnRamp: 0.0001, fruit: around(10).plusOrMinus(5) },
-  { speed: 90, spawn: 0.02, spawnRamp: 0.0001, fruit: around(20).plusOrMinus(5) },
-  { speed: 80, spawn: 0.02, spawnRamp: 0.0001, fruit: around(20).plusOrMinus(5) },
-  { speed: 80, spawn: 0.02, spawnRamp: 0.0001, fruit: around(40).plusOrMinus(5) },
-  { speed: 80, spawn: 0.025, spawnRamp: 0.0001, fruit: around(40).plusOrMinus(5) },
+  { speed: 100, spawn: 0.02, spawnRamp: -0.0005, fruit: around(3).plusOrMinus(1) },
+  { speed: 100, spawn: 0.02, spawnRamp: -0.0005, fruit: around(10).plusOrMinus(4) },
+  { speed: 100, spawn: 0.02, spawnRamp: -0.0005, fruit: around(10).plusOrMinus(5) },
+  { speed: 90, spawn: 0.02, spawnRamp: -0.0005, fruit: around(20).plusOrMinus(5) },
+  { speed: 80, spawn: 0.02, spawnRamp: -0.0005, fruit: around(20).plusOrMinus(5) },
+  { speed: 80, spawn: 0.02, spawnRamp: -0.0005, fruit: around(40).plusOrMinus(5) },
+  { speed: 80, spawn: 0.025, spawnRamp: -0.0005, fruit: around(40).plusOrMinus(5) },
 ]
 
 function generateVeryDifficultGame(level) {
@@ -242,11 +242,17 @@ class Snake {
   }
 
   grow() {
+    const opposite = this.#direction.opposite;
     return new Snake({
       position: this.#position,
       direction: this.#direction,
       length: this.#length + 1,
-      tail: [null, ...this.#tail],
+      tail: [
+        opposite.move(opposite.move(opposite.move(this.#tail[0]))),
+        opposite.move(opposite.move(this.#tail[0])),
+        opposite.move(this.#tail[0]),
+        ...this.#tail
+      ],
     });
   }
 
@@ -448,7 +454,7 @@ function nextBoardState(previousState, endGame) {
     let newFruit = fruit;
     let newStatistics = statistics;
     if (Math.random() < FRUIT_SPAWN_LIKELIHOOD) {
-      FRUIT_SPAWN_LIKELIHOOD += FRUIT_SPAWN_LIKELIHOOD_INCREASE_RATE;
+      FRUIT_SPAWN_LIKELIHOOD = Math.max(0, FRUIT_SPAWN_LIKELIHOOD + FRUIT_SPAWN_LIKELIHOOD_INCREASE_RATE);
       const { position, item } = generateRandomFruit(previousState.walls)
       newFruit = fruit.add(position, item);
     }
